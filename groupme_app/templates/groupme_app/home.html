@@ -1,0 +1,20 @@
+{% extends 'groupme_app/base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+
+<div class="input-home">
+    <div>
+        <h2 class="input-label"> Join a Class </h2>
+    </div>
+    <div>
+        <input id="input-classcode" type="text" placeholder="Enter your class code">
+        <button id="input-classcode-submit"> Join </button>
+    </div>
+    <div>
+        <a href="/"> or create a new class </a>
+    </div>
+</div>
+
+{% endblock %}

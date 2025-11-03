@@ -3,34 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Home{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-    </style>
+    <title>{% block title %}{% endblock %}</title>
 </head>
-
 <body>
     {% block content %}
     {% endblock %}
-    <footer class="footer text-white text-center py-3 bg-secondary mt-auto">
-        <div class="container">© {% now "Y" %}</div>
-    </footer>
 </body>
 </html>
-
-<!--
-We hereby attest to the truth of the following facts:
-
-We have not discussed the HTML, CSS, or Bootstrap code in our program with anyone other than our instructor or the teaching assistants for this course.
-We have not used HTML, CSS, or Bootstrap code obtained from other students or any unauthorized source, whether modified or unmodified.
-If any HTML, CSS, Bootstrap code, or documentation used in our program was obtained from another source (e.g., a textbook or course notes), 
-it has been clearly noted with a proper citation in the comments of our program.
-
-References:
-
--->

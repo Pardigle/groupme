@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Section
 
+def home(request):
+  return render(request, 'groupme_app/home.html')
+
 def create_section(request):
-    return render(request, 'groupme_app/create_section.html')
+  return render(request, 'groupme_app/create_section.html')
 
 def create_schedule(request):
-    return render(request, 'groupme_app/create_schedule.html')
+  return render(request, 'groupme_app/create_schedule.html')
 
 def student_list(request):
-    return render(request, 'groupme_app/student_list.html')
+  return render(request, 'groupme_app/student_list.html')
 
 
 
