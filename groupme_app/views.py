@@ -4,6 +4,9 @@ from .models import User, Section
 def home(request):
   return render(request, 'groupme_app/home.html')
 
+def join_class(request):
+  return render(request, 'groupme_app/join_class.html')
+
 def create_section(request):
   return render(request, 'groupme_app/create_section.html')
 
