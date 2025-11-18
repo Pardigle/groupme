@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from passcodes import create_passcode
-from models import Student, Section
+from app.passcodes import create_passcode
+from app.models import Student, Section
 import uvicorn
 
 api = FastAPI()
@@ -38,13 +38,13 @@ def view_group(request : Request):
 
 # REST API
 
-@api.post("api/create_section")
+@api.post("/api/create_section")
 def api_create_section(newSection : Section):
     passcode = create_passcode()
     db[passcode] = newSection
     return {'passcode':passcode}
 
-@api.post("api/{passcode}/create_student")
+@api.post("/api/{passcode}/create_student")
 def api_create_student(passcode : str, newStudent : Student):
     if passcode in db:
         studentDict = db[passcode].studentDict
@@ -52,19 +52,19 @@ def api_create_student(passcode : str, newStudent : Student):
         studentDict[student_id] = newStudent
         return {'student_id':student_id}
 
-@api.get("api/{passcode}/verify")
+@api.get("/api/{passcode}/verify")
 def api_verify_passcode(passcode : str):
     if passcode in db:
         return {'result':'success'}
     return {'result':'error'}
     
 
-@api.get("api/{passcode}")
+@api.get("/api/{passcode}")
 def api_view_section(passcode : str):
     if passcode in db:
         return db[passcode].model_dump()
     
-@api.get("api/{passcode}/{student_id}/group_cumulative")
+@api.get("/api/{passcode}/{student_id}/group_cumulative")
 def api_group_cumulative(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
         section = db[passcode]
