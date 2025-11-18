@@ -2,12 +2,46 @@
 <html lang="en">
     <head>
         <title> Create Section </title>
+        <script>
+
+            document.addEventListener('DOMContentLoaded', function() {
+
+                document.getElementById('create-section-form').onsubmit = function() {
+                    event.preventDefault();
+                    
+                    const name = document.getElementById('create-section-name').value;
+                    const desc = document.getElementById('create-section-description').value;
+                    const maxSize = parseInt(document.getElementById('create-section-maxsize').value);
+
+                    const newSection = {
+                        sectionName: name,
+                        sectionDetails: desc,
+                        maxSize: maxSize
+                    }
+
+                    fetch("api/create_section", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newSection)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const passcode = data["passcode"];
+                        alert(passcode)
+                    });
+                }
+
+            })
+
+        </script>
     </head>
     <body>
-        <form id="create-section-form">
-            <input id="create-section-name" type="text" placeholder="Name">
-            <input id="create-section-description" type="text" placeholder="Description">
-            <input id="create-section-maxsize" type="number" placeholder="Max Size">
+        <form method="post" id="create-section-form">
+            <input id="create-section-name" type="text" placeholder="Name" required>
+            <input id="create-section-description" type="text" placeholder="Description" required>
+            <input id="create-section-maxsize" type="number" placeholder="Max Size" min="1" required>
             <button id="create-section-submit" type="submit"> Create </button>
         </form>
     </body>

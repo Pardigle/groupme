@@ -1,41 +1,71 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from passcodes import create_passcode
 from models import Student, Section
 import uvicorn
 
 api = FastAPI()
+
+api.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+templates = Jinja2Templates(directory="app/templates")
+
 db = {}
 
 # ROUTES
 
 @api.get("/", response_class=HTMLResponse)
-def home():
-    return HTMLResponse("templates/home.html")
+def home(request : Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@api.get("/create_section", response_class=HTMLResponse)
+def create_section(request : Request):
+    return templates.TemplateResponse("create_section.html", {"request": request})
+
+@api.get("{passcode}/create_student", response_class=HTMLResponse)
+def create_student(request : Request):
+    return templates.TemplateResponse("create_student.html", {"request": request})
+
+@api.get("{passcode}/{student_id}")
+def view_section(request : Request):
+    return templates.TemplateResponse("view_section.html", {"request": request})
+
+@api.get("{passcode}/{student_id}/view_group")
+def view_group(request : Request):
+    return templates.TemplateResponse("view_groupmates.html", {"request": request})
 
 # REST API
 
 @api.post("api/create_section")
-def create_section(newSection : Section):
+def api_create_section(newSection : Section):
     passcode = create_passcode()
     db[passcode] = newSection
     return {'passcode':passcode}
 
 @api.post("api/{passcode}/create_student")
-def create_account(passcode : str, newStudent : Student):
+def api_create_student(passcode : str, newStudent : Student):
     if passcode in db:
         studentDict = db[passcode].studentDict
         student_id = len(studentDict)
         studentDict[student_id] = newStudent
         return {'student_id':student_id}
 
+@api.get("api/{passcode}/verify")
+def api_verify_passcode(passcode : str):
+    if passcode in db:
+        return {'result':'success'}
+    return {'result':'error'}
+    
+
 @api.get("api/{passcode}")
-def view_section(passcode : str):
+def api_view_section(passcode : str):
     if passcode in db:
         return db[passcode].model_dump()
     
 @api.get("api/{passcode}/{student_id}/group_cumulative")
-def group_cumulative(passcode : str, student_id : int):
+def api_group_cumulative(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
         section = db[passcode]
         student = section.studentDict[student_id]

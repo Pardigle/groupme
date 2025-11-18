@@ -2,12 +2,33 @@
 <html lang="en">
     <head>
         <title>Home</title>
+        <script>
+
+            document.addEventListener('DOMContentLoaded', function() {
+
+                document.getElementById('join-section-form').onsubmit = function() {
+                    const passcode = document.getElementById('passcode').value;
+                    fetch(`/api/${passcode}/verify`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const outcome = data["result"];
+                        if (outcome === "success") {
+                            window.location.href = `${passcode}/create_student`;
+                        } else {
+                            alert("Invalid passcode!");
+                        }
+                    });
+                }
+
+            })
+
+        </script>
     </head>
     <body>
-        <form id="join-section-form">
+        <form method="post" id="join-section-form">
             <input id="passcode" type="text" placeholder="Enter section passcode">
             <button type="submit"> Join </button>
         </form>
-        <a href="create_section.html"> or create a new section </a>
+        <a href="/create_section"> or create a new section </a>
     </body>
 </html>
