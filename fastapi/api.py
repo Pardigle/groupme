@@ -13,59 +13,60 @@ class Student(BaseModel):
     schedule : set[str]
 
 class Section(BaseModel):
-    passcode : str = ''
     sectionName : str
     sectionDetails : str
     maxSize : int
-    studentDict : dict[int, Student]
+    studentDict : dict[int, Student] = {}
 
 # API
 api = FastAPI()
 
 @api.post("/create_section")
 def create_section(newSection : Section):
-    newSection.passcode = create_passcode()
-    db[len(db)] = newSection
-    return {'message':'section created'}
+    passcode = create_passcode()
+    db[passcode] = newSection
+    return {'passcode':passcode}
 
-@api.post("/{section_id}/create_student")
-def create_account(section_id : int, newStudent : Student):
-    if section_id in db:
-        studentDict = db[section_id].studentDict
-        studentDict[len(studentDict)] = newStudent
-        return {'message':'student created.'}
+@api.post("/{passcode}/create_student")
+def create_account(passcode : str, newStudent : Student):
+    if passcode in db:
+        studentDict = db[passcode].studentDict
+        student_id = len(studentDict)
+        studentDict[student_id] = newStudent
+        return {'student_id':student_id}
 
-@api.get("/{section_id}")
-def view_section(section_id : int):
-    if section_id in db:
-        return db[section_id].model_dump()
+@api.get("/{passcode}")
+def view_section(passcode : str):
+    if passcode in db:
+        return db[passcode].model_dump()
     
-@api.get("/{section_id}/{student_id}/group_cumulative")
-def group_cumulative(section_id : int, student_id : int):
-    if validate_student(section_id, student_id):
-        section = db[section_id]
+@api.get("/{passcode}/{student_id}/group_cumulative")
+def group_cumulative(passcode : str, student_id : int):
+    if validate_student(passcode, student_id):
+        section = db[passcode]
         student = section.studentDict[student_id]
         similarSchedules = similar_hours_cumultative(student, section)
         sortedSimilarSchedules = rank_schedules(similarSchedules)
         return dict(sortedSimilarSchedules)
 
-def validate_student(section_id : int, student_id : int):
-    if section_id in db:
-        if student_id in db[section_id].studentDict:
+def validate_student(passcode : str, student_id : int):
+    if passcode in db:
+        if student_id in db[passcode].studentDict:
             return True
     return False
 
 # ALGORITHMS
 
 def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
-    similarHours = list[list[int, str]]
+    similarHours = []
     rankingList = currentSection.studentDict
     studentSched = currentStudent.schedule
-    for student_id, student in enumerate(rankingList):
+    for student_id in rankingList:
+        student = rankingList[student_id]
         if student != currentStudent:
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
-            similarHours.append(student_id, len(similarSched) * 0.5)
+            similarHours.append((student_id, len(similarSched) * 0.5))
     return similarHours
 
 def merge(L1, L2):
