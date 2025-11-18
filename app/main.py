@@ -1,33 +1,27 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-import uvicorn
+from fastapi.responses import HTMLResponse
 from passcodes import create_passcode
+from models import Student, Section
+import uvicorn
 
-# Theoretical Database
+api = FastAPI()
 db = {}
 
-# Models
-class Student(BaseModel):
-    displayName : str
-    contactDetails : str
-    schedule : set[str]
+# ROUTES
 
-class Section(BaseModel):
-    sectionName : str
-    sectionDetails : str
-    maxSize : int
-    studentDict : dict[int, Student] = {}
+@api.get("/", response_class=HTMLResponse)
+def home():
+    return HTMLResponse("templates/home.html")
 
-# API
-api = FastAPI()
+# REST API
 
-@api.post("/create_section")
+@api.post("api/create_section")
 def create_section(newSection : Section):
     passcode = create_passcode()
     db[passcode] = newSection
     return {'passcode':passcode}
 
-@api.post("/{passcode}/create_student")
+@api.post("api/{passcode}/create_student")
 def create_account(passcode : str, newStudent : Student):
     if passcode in db:
         studentDict = db[passcode].studentDict
@@ -35,19 +29,19 @@ def create_account(passcode : str, newStudent : Student):
         studentDict[student_id] = newStudent
         return {'student_id':student_id}
 
-@api.get("/{passcode}")
+@api.get("api/{passcode}")
 def view_section(passcode : str):
     if passcode in db:
         return db[passcode].model_dump()
     
-@api.get("/{passcode}/{student_id}/group_cumulative")
+@api.get("api/{passcode}/{student_id}/group_cumulative")
 def group_cumulative(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
         section = db[passcode]
         student = section.studentDict[student_id]
         similarSchedules = similar_hours_cumultative(student, section)
         sortedSimilarSchedules = rank_schedules(similarSchedules)
-        return dict(sortedSimilarSchedules)
+        return sortedSimilarSchedules
 
 def validate_student(passcode : str, student_id : int):
     if passcode in db:
@@ -86,7 +80,7 @@ def merge(L1, L2):
         L1.pop(0)
     return mergedList
 
-def rank_schedules(similarHours): #mergesorted
+def rank_schedules(similarHours):
     if len(similarHours) <= 1:
         return similarHours
     else:
