@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from passcodes import create_passcode
-from models import Student, Section
+from app.passcodes import create_passcode
+from app.models import Student, Section
 import uvicorn
 
 api = FastAPI()

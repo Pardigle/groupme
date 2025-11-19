@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="UTF-8">
+
+        <title> View Section </title>
+        <script>
+            // original code: https://jsfiddle.net/Brv6J/3/
+            // sources used: https://ryfarlane.com/article/toggle-class-vanilla-javascript
+            // https://developer.mozilla.org/en-US/docs/Web/API/Element/mousedown_event 
+            // https://www.w3schools.com/jsref/event_preventdefault.asp
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // FUNCTIONALITY FOR HIGHLIGHTING CELLS
+                let isHighlighted = false;
+                let cursorClicked = false;
+                let cells = document.querySelectorAll("#create-schedule-table .clickable");
+
+                cells.forEach(function(cell) {
+                    cell.addEventListener('mousedown', function(event) {
+                        cursorClicked = true;
+                        this.classList.toggle("highlighted");
+                        isHighlighted = this.classList.contains("highlighted");
+                        event.preventDefault();
+                    });
+
+                    cell.addEventListener('mouseover', function() {
+                        if (cursorClicked) {
+                            this.classList.toggle("highlighted", isHighlighted);
+                        }
+                    });
+
+                    document.addEventListener('mouseup', function() {
+                        cursorClicked = false;
+                    })
+                })
+
+                // FUNCTIONALITY FOR SUBMITTING
+                const submit = document.querySelector("#save_sched")
+
+                submit.onclick = function(event){
+                    const finalSchedule = new Set();
+                    const selectedCells = document.querySelectorAll(".highlighted");
+
+                    selectedCells.forEach(function(cell){
+                        let cellDay = cell.getAttribute("day");
+                        let cellTime = cell.getAttribute("time");
+                        let timeCombined = cellDay + cellTime;
+                        finalSchedule.add(timeCombined); 
+                    });
+                    console.log(finalSchedule);
+                    alert("schedule is in the console for now")
+                }
+            });
+        </script>
+        
+        <style>
+          .clickable {
+            height: 25px;
+            width:150px;
+            text-align:center;
+            vertical-align:middle;
+            background-color:azure;
+            border:1px solid white;
+          }
+          
+          .time-label, .days_header {
+            background-color: white;
+          }
+          
+          table td.highlighted {
+            background-color: lightgreen;
+          }
+        </style>
+    </head>
+    <body>
+        <table id="create-schedule-table">
+            <!--custom attributes: https://www.geeksforgeeks.org/html/what-are-custom-attributes-in-html5/-->
+            <tr>
+                <td class="days-header"></td>
+                <td class="days-header">Mon</td>
+                <td class="days-header">Tues</td>
+                <td class="days-header">Wed</td>
+                <td class="days-header">Thurs</td>
+                <td class="days-header">Fri</td>
+                <td class="days-header">Sat</td>
+                <td class="days-header">Sun</td>
+            </tr>
+            <tr>
+                <td class="time-label">8:00-8:30</td>
+                <td class="clickable" day="M-"   time="800-830"></td>
+                <td class="clickable" day="T-"   time="800-830"></td>
+                <td class="clickable" day="W-"   time="800-830"></td>
+                <td class="clickable" day="Th-"  time="800-830"></td>
+                <td class="clickable" day="F-"   time="800-830"></td>
+                <td class="clickable" day="Sat-" time="800-830"></td>
+                <td class="clickable" day="Sun-" time="800-830"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="830-900"></td>
+                <td class="clickable" day="T-"   time="830-900"></td>
+                <td class="clickable" day="W-"   time="830-900"></td>
+                <td class="clickable" day="Th-"  time="830-900"></td>
+                <td class="clickable" day="F-"   time="830-900"></td>
+                <td class="clickable" day="Sat-" time="830-900"></td>
+                <td class="clickable" day="Sun-" time="830-900"></td>
+            </tr>
+            <tr>
+                <td class="time-label">9:00-9:30</td>
+                <td class="clickable" day="M-"   time="900-930"></td>
+                <td class="clickable" day="T-"   time="900-930"></td>
+                <td class="clickable" day="W-"   time="900-930"></td>
+                <td class="clickable" day="Th-"  time="900-930"></td>
+                <td class="clickable" day="F-"   time="900-930"></td>
+                <td class="clickable" day="Sat-" time="900-930"></td>
+                <td class="clickable" day="Sun-" time="900-930"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"    time="930-1000"></td>
+                <td class="clickable" day="T-"    time="930-1000"></td>
+                <td class="clickable" day="W-"    time="930-1000"></td>
+                <td class="clickable" day="Th-"   time="930-1000"></td>
+                <td class="clickable" day="F-"    time="930-1000"></td>
+                <td class="clickable" day="Sat-"  time="930-1000"></td>
+                <td class="clickable" day="Sun-"  time="930-1000"></td>
+            </tr>
+            <tr>
+                <td class="time-label">10:00-10:30</td>
+                <td class="clickable" day="M-"   time="1000-1030"></td>
+                <td class="clickable" day="T-"   time="1000-1030"></td>
+                <td class="clickable" day="W-"   time="1000-1030"></td>
+                <td class="clickable" day="Th-"  time="1000-1030"></td>
+                <td class="clickable" day="F-"   time="1000-1030"></td>
+                <td class="clickable" day="Sat-" time="1000-1030"></td>
+                <td class="clickable" day="Sun-" time="1000-1030"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1030-1100"></td>
+                <td class="clickable" day="T-"   time="1030-1100"></td>
+                <td class="clickable" day="W-"   time="1030-1100"></td>
+                <td class="clickable" day="Th-"  time="1030-1100"></td>
+                <td class="clickable" day="F-"   time="1030-1100"></td>
+                <td class="clickable" day="Sat-" time="1030-1100"></td>
+                <td class="clickable" day="Sun-" time="1030-1100"></td>
+            </tr>
+            <tr>
+                <td class="time-label">11:00-11:30</td>
+                <td class="clickable" day="M-"   time="1100-1130"></td>
+                <td class="clickable" day="T-"   time="1100-1130"></td>
+                <td class="clickable" day="W-"   time="1100-1130"></td>
+                <td class="clickable" day="Th-"  time="1100-1130"></td>
+                <td class="clickable" day="F-"   time="1100-1130"></td>
+                <td class="clickable" day="Sat-" time="1100-1130"></td>
+                <td class="clickable" day="Sun-" time="1100-1130"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1130-1200"></td>
+                <td class="clickable" day="T-"   time="1130-1200"></td>
+                <td class="clickable" day="W-"   time="1130-1200"></td>
+                <td class="clickable" day="Th-"  time="1130-1200"></td>
+                <td class="clickable" day="F-"   time="1130-1200"></td>
+                <td class="clickable" day="Sat-" time="1130-1200"></td>
+                <td class="clickable" day="Sun-" time="1130-1200"></td>
+            </tr>
+            <tr>
+                <td class="time-label">12:00-12:30</td>
+                <td class="clickable" day="M-"   time="1200-1230"></td>
+                <td class="clickable" day="T-"   time="1200-1230"></td>
+                <td class="clickable" day="W-"   time="1200-1230"></td>
+                <td class="clickable" day="Th-"  time="1200-1230"></td>
+                <td class="clickable" day="F-"   time="1200-1230"></td>
+                <td class="clickable" day="Sat-" time="1200-1230"></td>
+                <td class="clickable" day="Sun-" time="1200-1230"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1230-1300"></td>
+                <td class="clickable" day="T-"   time="1230-1300"></td>
+                <td class="clickable" day="W-"   time="1230-1300"></td>
+                <td class="clickable" day="Th-"  time="1230-1300"></td>
+                <td class="clickable" day="F-"   time="1230-1300"></td>
+                <td class="clickable" day="Sat-" time="1230-1300"></td>
+                <td class="clickable" day="Sun-" time="1230-1300"></td>
+            </tr>
+            <tr>
+                <td class="time-label">13:00-13:30</td>
+                <td class="clickable" day="M-"   time="1300-1330"></td>
+                <td class="clickable" day="T-"   time="1300-1330"></td>
+                <td class="clickable" day="W-"   time="1300-1330"></td>
+                <td class="clickable" day="Th-"  time="1300-1330"></td>
+                <td class="clickable" day="F-"   time="1300-1330"></td>
+                <td class="clickable" day="Sat-" time="1300-1330"></td>
+                <td class="clickable" day="Sun-" time="1300-1330"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1330-1400"></td>
+                <td class="clickable" day="T-"   time="1330-1400"></td>
+                <td class="clickable" day="W-"   time="1330-1400"></td>
+                <td class="clickable" day="Th-"  time="1330-1400"></td>
+                <td class="clickable" day="F-"   time="1330-1400"></td>
+                <td class="clickable" day="Sat-" time="1330-1400"></td>
+                <td class="clickable" day="Sun-" time="1330-1400"></td>
+            </tr>
+            <tr>
+                <td class="time-label">14:00-14:30</td>
+                <td class="clickable" day="M-"   time="1400-1430"></td>
+                <td class="clickable" day="T-"   time="1400-1430"></td>
+                <td class="clickable" day="W-"   time="1400-1430"></td>
+                <td class="clickable" day="Th-"  time="1400-1430"></td>
+                <td class="clickable" day="F-"   time="1400-1430"></td>
+                <td class="clickable" day="Sat-" time="1400-1430"></td>
+                <td class="clickable" day="Sun-" time="1400-1430"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1430-1500"></td>
+                <td class="clickable" day="T-"   time="1430-1500"></td>
+                <td class="clickable" day="W-"   time="1430-1500"></td>
+                <td class="clickable" day="Th-"  time="1430-1500"></td>
+                <td class="clickable" day="F-"   time="1430-1500"></td>
+                <td class="clickable" day="Sat-" time="1430-1500"></td>
+                <td class="clickable" day="Sun-" time="1430-1500"></td>
+            </tr> 
+            <tr>
+                <td class="time-label">15:00-15:30</td>
+                <td class="clickable" day="M-"   time="1500-1530"></td>
+                <td class="clickable" day="T-"   time="1500-1530"></td>
+                <td class="clickable" day="W-"   time="1500-1530"></td>
+                <td class="clickable" day="Th-"  time="1500-1530"></td>
+                <td class="clickable" day="F-"   time="1500-1530"></td>
+                <td class="clickable" day="Sat-" time="1500-1530"></td>
+                <td class="clickable" day="Sun-" time="1500-1530"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1530-1600"></td>
+                <td class="clickable" day="T-"   time="1530-1600"></td>
+                <td class="clickable" day="W-"   time="1530-1600"></td>
+                <td class="clickable" day="Th-"  time="1530-1600"></td>
+                <td class="clickable" day="F-"   time="1530-1600"></td>
+                <td class="clickable" day="Sat-" time="1530-1600"></td>
+                <td class="clickable" day="Sun-" time="1530-1600"></td>
+            </tr>
+            <tr>
+                <td class="time-label">16:00-16:30</td>
+                <td class="clickable" day="M-"   time="1600-1630"></td>
+                <td class="clickable" day="T-"   time="1600-1630"></td>
+                <td class="clickable" day="W-"   time="1600-1630"></td>
+                <td class="clickable" day="Th-"  time="1600-1630"></td>
+                <td class="clickable" day="F-"   time="1600-1630"></td>
+                <td class="clickable" day="Sat-" time="1600-1630"></td>
+                <td class="clickable" day="Sun-" time="1600-1630"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1630-1700"></td>
+                <td class="clickable" day="T-"   time="1630-1700"></td>
+                <td class="clickable" day="W-"   time="1630-1700"></td>
+                <td class="clickable" day="Th-"  time="1630-1700"></td>
+                <td class="clickable" day="F-"   time="1630-1700"></td>
+                <td class="clickable" day="Sat-" time="1630-1700"></td>
+                <td class="clickable" day="Sun-" time="1630-1700"></td>
+            </tr>
+            <tr>
+                <td class="time-label">17:00-17:30</td>
+                <td class="clickable" day="M-"   time="1700-1730"></td>
+                <td class="clickable" day="T-"   time="1700-1730"></td>
+                <td class="clickable" day="W-"   time="1700-1730"></td>
+                <td class="clickable" day="Th-"  time="1700-1730"></td>
+                <td class="clickable" day="F-"   time="1700-1730"></td>
+                <td class="clickable" day="Sat-" time="1700-1730"></td>
+                <td class="clickable" day="Sun-" time="1700-1730"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1730-1800"></td>
+                <td class="clickable" day="T-"   time="1730-1800"></td>
+                <td class="clickable" day="W-"   time="1730-1800"></td>
+                <td class="clickable" day="Th-"  time="1730-1800"></td>
+                <td class="clickable" day="F-"   time="1730-1800"></td>
+                <td class="clickable" day="Sat-" time="1730-1800"></td>
+                <td class="clickable" day="Sun-" time="1730-1800"></td>
+            </tr>
+            <tr>
+                <td class="time-label">18:00-18:30</td>
+                <td class="clickable" day="M-"   time="1800-1830"></td>
+                <td class="clickable" day="T-"   time="1800-1830"></td>
+                <td class="clickable" day="W-"   time="1800-1830"></td>
+                <td class="clickable" day="Th-"  time="1800-1830"></td>
+                <td class="clickable" day="F-"   time="1800-1830"></td>
+                <td class="clickable" day="Sat-" time="1800-1830"></td>
+                <td class="clickable" day="Sun-" time="1800-1830"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1830-1900"></td>
+                <td class="clickable" day="T-"   time="1830-1900"></td>
+                <td class="clickable" day="W-"   time="1830-1900"></td>
+                <td class="clickable" day="Th-"  time="1830-1900"></td>
+                <td class="clickable" day="F-"   time="1830-1900"></td>
+                <td class="clickable" day="Sat-" time="1830-1900"></td>
+                <td class="clickable" day="Sun-" time="1830-1900"></td>
+            </tr>
+            <tr>
+                <td class="time-label">19:00-19:30</td>
+                <td class="clickable" day="M-"   time="1900-1930"></td>
+                <td class="clickable" day="T-"   time="1900-1930"></td>
+                <td class="clickable" day="W-"   time="1900-1930"></td>
+                <td class="clickable" day="Th-"  time="1900-1930"></td>
+                <td class="clickable" day="F-"   time="1900-1930"></td>
+                <td class="clickable" day="Sat-" time="1900-1930"></td>
+                <td class="clickable" day="Sun-" time="1900-1930"></td>
+            </tr>
+            <tr>
+                <td class="time-label"></td>
+                <td class="clickable" day="M-"   time="1930-2000"></td>
+                <td class="clickable" day="T-"   time="1930-2000"></td>
+                <td class="clickable" day="W-"   time="1930-2000"></td>
+                <td class="clickable" day="Th-"  time="1930-2000"></td>
+                <td class="clickable" day="F-"   time="1930-2000"></td>
+                <td class="clickable" day="Sat-" time="1930-2000"></td>
+                <td class="clickable" day="Sun-" time="1930-2000"></td>
+            </tr>
+        </table>
+        <button id="save_sched">Save Schedule</button>
+    </body>
+</html>
