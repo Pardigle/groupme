@@ -3,13 +3,44 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
-
         <title> Create Student </title>
+        <script>
+
+            document.addEventListener('DOMContentLoaded', function() {
+
+                document.getElementById('create-student-form').onsubmit = function() {
+                    event.preventDefault();
+                    
+                    const name = document.getElementById('create-student-name').value;
+                    const contact = document.getElementById('create-student-contact').value;
+                    const passcode = "{{ passcode }}";
+
+                    const newStudent = {
+                        displayName: name,
+                        contactDetails: contact,
+                    }
+
+                    fetch(`/api/${passcode}/create_student`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newStudent)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data["student_id"])
+                    });
+                }
+
+            })
+
+        </script>
     </head>
     <body>
         <form method="post" id="create-student-form">
-            <input id="create-student-name" type="text" placeholder="Name">
-            <input id="create-student-contact" type="text" placeholder="Description">
+            <input id="create-student-name" type="text" placeholder="Display Name">
+            <input id="create-student-contact" type="text" placeholder="Contact Details">
             <button id="create-student-submit" type="submit"> Submit </button>
         </form>
     </body>

@@ -24,15 +24,15 @@ def home(request : Request):
 def create_section(request : Request):
     return templates.TemplateResponse("create_section.html", {"request": request})
 
-@api.get("{passcode}/create_student", response_class=HTMLResponse)
-def create_student(request : Request):
-    return templates.TemplateResponse("create_student.html", {"request": request})
+@api.get("/{passcode}/create_student", response_class=HTMLResponse)
+def create_student(request : Request, passcode : str):
+    return templates.TemplateResponse("create_student.html", {"request": request, "passcode":passcode})
 
-@api.get("{passcode}/{student_id}")
+@api.get("/{passcode}/{student_id}")
 def view_section(request : Request):
     return templates.TemplateResponse("view_section.html", {"request": request})
 
-@api.get("{passcode}/{student_id}/view_group")
+@api.get("/{passcode}/{student_id}/view_group")
 def view_group(request : Request):
     return templates.TemplateResponse("view_groupmates.html", {"request": request})
 

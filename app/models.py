@@ -3,7 +3,7 @@ from pydantic import BaseModel
 class Student(BaseModel):
     displayName : str
     contactDetails : str
-    schedule : set[str]
+    schedule : set[str] = {}
 
 class Section(BaseModel):
     sectionName : str
