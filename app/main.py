@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.passcodes import create_passcode
-from app.models import Student, Section
+from passcodes import create_passcode
+from models import Student, Section
 import uvicorn
 
 api = FastAPI()
@@ -36,7 +36,7 @@ def view_section(request : Request):
 def view_group(request : Request):
     return templates.TemplateResponse("view_groupmates.html", {"request": request})
 
-# REST API
+# BACKEND
 
 @api.post("/api/create_section")
 def api_create_section(newSection : Section):

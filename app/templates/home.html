@@ -10,6 +10,8 @@
             document.addEventListener('DOMContentLoaded', function() {
 
                 document.getElementById('join-section-form').onsubmit = function() {
+                    event.preventDefault();
+
                     const passcode = document.getElementById('passcode').value;
                     fetch(`/api/${passcode}/verify`)
                     .then(response => response.json())
