@@ -50,7 +50,23 @@
                         finalSchedule.add(timeCombined); 
                     });
                     console.log(finalSchedule);
-                    alert("schedule is in the console for now")
+
+                    const updatedSchedule = {
+                        schedule : finalSchedule
+                    }
+
+                    fetch("/api/{{ passcode }}/{{ student_id }}/update_schedule", {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedSchedule)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const result = data["result"]
+                        alert(result);
+                    });
                 }
             });
         </script>

@@ -9,4 +9,4 @@ class Section(BaseModel):
     sectionName : str
     sectionDetails : str
     maxSize : int
-    studentDict : dict[int, Student] = {}
+    studentList : list[Student] = []

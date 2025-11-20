@@ -29,7 +29,8 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        alert(data["student_id"])
+                        const student_id = data["student_id"];
+                        window.location.href = `/${passcode}/${student_id}`;
                     });
                 }
 
