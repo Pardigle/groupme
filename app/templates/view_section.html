@@ -40,14 +40,14 @@
                 const submit = document.querySelector("#save_sched")
 
                 submit.onclick = function(event){
-                    const finalSchedule = new Set();
+                    const finalSchedule = new Array();
                     const selectedCells = document.querySelectorAll(".highlighted");
 
                     selectedCells.forEach(function(cell){
                         let cellDay = cell.getAttribute("day");
                         let cellTime = cell.getAttribute("time");
                         let timeCombined = cellDay + cellTime;
-                        finalSchedule.add(timeCombined); 
+                        finalSchedule.push(timeCombined); 
                     });
                     console.log(finalSchedule);
 
@@ -56,7 +56,7 @@
                     }
 
                     fetch("/api/{{ passcode }}/{{ student_id }}/update_schedule", {
-                        method: 'PATCH',
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },

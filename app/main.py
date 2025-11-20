@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from passcodes import create_passcode
-from models import Student, Section
+from models import Student, Section, ScheduleUpdate
 import uvicorn
 
 api = FastAPI()
@@ -55,13 +55,14 @@ def api_create_student(passcode : str, newStudent : Student):
         studentList.append(newStudent)
         return {'student_id':student_id}
     
-@api.patch("/api/{passcode}/{student_id}/update_schedule")
-def api_update_schedule(passcode : str, student_id : int, schedule : set[str]):
+@api.post("/api/{passcode}/{student_id}/update_schedule")
+def api_update_schedule(passcode : str, student_id : int, update : ScheduleUpdate):
     if passcode in db:
         section = db[passcode]
-        if student_id <= section.studentList:
-            updatedStudent = section[student_id].model_copy(update=schedule)
-            section[student_id] = updatedStudent
+        if student_id in range(len(section.studentList)):
+            student = section.studentList[student_id]
+            schedule = update.schedule
+            student.schedule = set(schedule)
             return {'result':'success'}
     return {'result':'error'}
 

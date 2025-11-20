@@ -10,3 +10,6 @@ class Section(BaseModel):
     sectionDetails : str
     maxSize : int
     studentList : list[Student] = []
+
+class ScheduleUpdate(BaseModel):
+    schedule: list[str]
