@@ -14,32 +14,12 @@ templates = Jinja2Templates(directory="app/templates")
 
 db = {}
 
-# ROUTES
-
-@api.get("/", response_class=HTMLResponse)
-def home(request : Request):
-    return templates.TemplateResponse("home.html", {"request": request})
-
-@api.get("/create_section", response_class=HTMLResponse)
-def create_section(request : Request):
-    return templates.TemplateResponse("create_section.html", {"request": request})
-
-@api.get("/{passcode}/create_student", response_class=HTMLResponse)
-def create_student(request : Request, passcode : str):
-    return templates.TemplateResponse("create_student.html", {"request": request, 
-                                                              "passcode":passcode})
-
-@api.get("/{passcode}/{student_id}")
-def view_section(request : Request, passcode : str, student_id : int):
-    return templates.TemplateResponse("view_section.html", {"request": request, 
-                                                            "passcode": passcode, 
-                                                            "student_id": student_id})
-
-@api.get("/{passcode}/{student_id}/view_group")
-def view_group(request : Request):
-    return templates.TemplateResponse("view_groupmates.html", {"request": request})
-
 # BACKEND
+
+@api.get("/api/{passcode}")
+def api_view_section(passcode : str):
+    if passcode in db:
+        return db[passcode].model_dump()
 
 @api.post("/api/create_section")
 def api_create_section(newSection : Section):
@@ -72,11 +52,6 @@ def api_verify_passcode(passcode : str):
     if passcode in db:
         return {'result':'success'}
     return {'result':'error'}
-
-@api.get("/api/{passcode}")
-def api_view_section(passcode : str):
-    if passcode in db:
-        return db[passcode].model_dump()
     
 @api.get("/api/{passcode}/{student_id}/group_cumulative")
 def api_group_cumulative(passcode : str, student_id : int):
@@ -89,7 +64,7 @@ def api_group_cumulative(passcode : str, student_id : int):
 
 def validate_student(passcode : str, student_id : int):
     if passcode in db:
-        if student_id in db[passcode].studentList:
+        if student_id in range(len(db[passcode].studentList)):
             return True
     return False
 
@@ -99,12 +74,11 @@ def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
     similarHours = []
     rankingList = currentSection.studentList
     studentSched = currentStudent.schedule
-    for student_id in rankingList:
-        student = rankingList[student_id]
+    for student in rankingList:
         if student != currentStudent:
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
-            similarHours.append((student_id, len(similarSched) * 0.5))
+            similarHours.append((student.displayName, len(similarSched) * 0.5))
     return similarHours
 
 def merge(L1, L2):
@@ -136,5 +110,30 @@ def rank_schedules(similarHours):
         secondHalf = rank_schedules(secondHalf)
         return merge(firstHalf, secondHalf)
     
+# ROUTES
+
+@api.get("/", response_class=HTMLResponse)
+def home(request : Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@api.get("/create_section", response_class=HTMLResponse)
+def create_section(request : Request):
+    return templates.TemplateResponse("create_section.html", {"request": request})
+
+@api.get("/{passcode}/create_student", response_class=HTMLResponse)
+def create_student(request : Request, passcode : str):
+    return templates.TemplateResponse("create_student.html", {"request": request, 
+                                                              "passcode":passcode})
+
+@api.get("/{passcode}/{student_id}")
+def view_section(request : Request, passcode : str, student_id : int):
+    return templates.TemplateResponse("view_section.html", {"request": request, 
+                                                            "passcode": passcode, 
+                                                            "student_id": student_id})
+
+@api.get("/{passcode}/{student_id}/view_group")
+def view_group(request : Request):
+    return templates.TemplateResponse("view_groupmates.html", {"request": request})
+
 if __name__ == "__main__":
     uvicorn.run(api)
