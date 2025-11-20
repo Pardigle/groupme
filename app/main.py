@@ -132,8 +132,10 @@ def view_section(request : Request, passcode : str, student_id : int):
                                                             "student_id": student_id})
 
 @api.get("/{passcode}/{student_id}/view_group")
-def view_group(request : Request):
-    return templates.TemplateResponse("view_groupmates.html", {"request": request})
+def view_group(request : Request, passcode : str, student_id : int):
+    return templates.TemplateResponse("view_groupmates.html", {"request": request, 
+                                                            "passcode": passcode, 
+                                                            "student_id": student_id})
 
 if __name__ == "__main__":
     uvicorn.run(api)
