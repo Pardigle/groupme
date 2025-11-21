@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="UTF-8">
-        <title> Create Student </title>
+{% extends 'base.html' %}
+{% block title %}Create Student{% endblock %}
+{% block scripts %}
         <script>
 
             document.addEventListener('DOMContentLoaded', function() {
@@ -37,12 +34,16 @@
             })
 
         </script>
-    </head>
-    <body>
-        <form method="post" id="create-student-form">
-            <input id="create-student-name" type="text" placeholder="Display Name">
-            <input id="create-student-contact" type="text" placeholder="Contact Details">
-            <button id="create-student-submit" type="submit"> Join </button>
-        </form>
-    </body>
-</html>
+{% endblock %}
+{% block content %}
+    <content class="d-flex justify-content-center align-items-center flex-grow-1">
+        <div class="text-center"> 
+            <h5> How do you want to be displayed as? </h5>
+            <form class="form" method="post" id="create-student-form">
+                <input class="form-control my-2" id="create-student-name" type="text" placeholder="Display Name" required>
+                <input class="form-control my-2" id="create-student-contact" type="text" placeholder="Contact Details" required>
+            <button class="btn btn-outline-success w-100" id="create-student-submit" type="submit"> Join </button>
+            </form>
+        </div>
+    </content>
+{% endblock %}
