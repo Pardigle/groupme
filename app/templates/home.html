@@ -1,18 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 75%;">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
-
         <title>Home</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+        <style>
+            a, input, h5, button[type="submit"], input[type="text"] {
+                font-family: "Quicksand";
+            }
+        </style>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <script>
 
             document.addEventListener('DOMContentLoaded', function() {
-
-                document.getElementById('join-section-form').onsubmit = function() {
+                document.getElementById('join-section-form').onsubmit = function(event) {
                     event.preventDefault();
-
                     const passcode = document.getElementById('passcode').value;
+
                     fetch(`/api/${passcode}/verify`)
                     .then(response => response.json())
                     .then(data => {
@@ -20,20 +28,53 @@
                         if (outcome === "success") {
                             window.location.href = `${passcode}/create_student`;
                         } else {
-                            alert("Invalid passcode!");
+                            var alertToastElement = document.getElementById('alertToast');
+                            var alertMessage = new bootstrap.Toast(alertToastElement);
+                            alertMessage.show();
                         }
                     });
+                    
                 }
-
-            })
-
+            });
         </script>
     </head>
-    <body>
-        <form method="post" id="join-section-form">
-            <input id="passcode" type="text" placeholder="Enter section passcode">
-            <button type="submit"> Join </button>
-        </form>
-        <a href="/create_section"> or create a new section </a>
+
+    <body class="d-flex flex-column" style="height: 100%">
+        
+        <div>
+            <nav class="navbar navbar-light bg-transparent">
+                <a class="navbar-brand px-5 pt-4" href="/">
+                    <img src="{{ url_for('static', path='/templates/logo/GroupMeLogo.svg') }}" height="30" alt="Logo">
+                </a>
+            </nav>
+        </div>
+        
+        <content class="d-flex justify-content-center align-items-center flex-grow-1">
+            
+            <div class="text-center"> 
+                
+                <h5> Join a Class </h5>
+                
+                <form class="d-flex justify-content-center my-2" method="post" id="join-section-form">
+                    <input class="form-control mx-1" id="passcode" type="text" placeholder="Enter your class code" required>
+                    <button class="btn btn-outline-success" type="submit"> Join </button>
+                </form>
+                
+                <div>
+                    <a href="/create_section"> or create a new section </a>
+                </div>
+                
+            </div>
+        </content>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+            <div id="alertToast" class="toast align-items-center border-0 bg-danger text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+                <div class="d-flex">
+                    <div class="toast-body fs-6 fw-semibold">
+                        Invalid class code.
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

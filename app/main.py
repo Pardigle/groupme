@@ -8,7 +8,7 @@ import uvicorn
 
 api = FastAPI()
 
-api.mount("/static", StaticFiles(directory="app/static"), name="static")
+api.mount("/static", StaticFiles(directory="app"), name="static")
 
 templates = Jinja2Templates(directory="app/templates")
 
