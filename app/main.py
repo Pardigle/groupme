@@ -34,16 +34,23 @@ def api_create_student(passcode : str, newStudent : Student):
         student_id = len(studentList)
         studentList.append(newStudent)
         return {'student_id':student_id}
-    
+
+@api.get("/api/{passcode}/{student_id}/view_schedule")
+def api_view_schedule(passcode : str, student_id : int):
+    if validate_student(passcode, student_id):
+        section = db[passcode]
+        student = section.studentList[student_id]
+        schedule = student.schedule
+        return {'schedule':schedule}
+
 @api.post("/api/{passcode}/{student_id}/update_schedule")
 def api_update_schedule(passcode : str, student_id : int, update : ScheduleUpdate):
-    if passcode in db:
+    if validate_student(passcode, student_id):
         section = db[passcode]
-        if student_id in range(len(section.studentList)):
-            student = section.studentList[student_id]
-            schedule = update.schedule
-            student.schedule = set(schedule)
-            return {'result':'success'}
+        student = section.studentList[student_id]
+        schedule = update.schedule
+        student.schedule = set(schedule)
+        return {'result':'success'}
     return {'result':'error'}
 
 

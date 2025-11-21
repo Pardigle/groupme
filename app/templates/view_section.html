@@ -16,6 +16,21 @@
                 let isHighlighted = false;
                 let cursorClicked = false;
                 let cells = document.querySelectorAll("#create-schedule-table .clickable");
+                let currentlyClicked;
+
+                var existingSchedule = new Array();
+
+                fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
+                .then(response => response.json())
+                .then(data => {
+                    existingSchedule = data["schedule"];
+                })
+
+                cells.forEach(function(cell) {
+                    if (existingSchedule.includes(cell.getAttribute('day') + cell.getAttribute('time'))) {
+                        this.classList.toggle("highlighted");
+                    }
+                })
 
                 cells.forEach(function(cell) {
                     cell.addEventListener('mousedown', function(event) {
