@@ -68,6 +68,12 @@
                         alert(result);
                     });
                 }
+
+                const groupMe = document.getElementById('group_me');
+                groupMe.onclick = function(event){
+                    window.location.href = "/{{ passcode }}/{{ student_id }}/view_group";
+                }
+
             });
         </script>
         
@@ -345,5 +351,6 @@
             </tr>
         </table>
         <button id="save_sched">Save Schedule</button>
+        <button id="group_me"> Group Me </button>
     </body>
 </html>

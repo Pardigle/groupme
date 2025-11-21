@@ -60,7 +60,7 @@ def api_group_cumulative(passcode : str, student_id : int):
         student = section.studentList[student_id]
         similarSchedules = similar_hours_cumultative(student, section)
         sortedSimilarSchedules = rank_schedules(similarSchedules)
-        return sortedSimilarSchedules
+        return {"data":sortedSimilarSchedules}
 
 def validate_student(passcode : str, student_id : int):
     if passcode in db:
