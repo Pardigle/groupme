@@ -24,12 +24,10 @@
                 .then(response => response.json())
                 .then(data => {
                     existingSchedule = data["schedule"];
-                })
-
-                cells.forEach(function(cell) {
+                    cells.forEach(function(cell) {
                     if (existingSchedule.includes(cell.getAttribute('day') + cell.getAttribute('time'))) {
-                        this.classList.toggle("highlighted");
-                    }
+                        cell.classList.toggle("highlighted");
+                    }})
                 })
 
                 cells.forEach(function(cell) {
