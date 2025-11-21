@@ -81,11 +81,12 @@ def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
     similarHours = []
     rankingList = currentSection.studentList
     studentSched = currentStudent.schedule
+    student_id = 0
     for student in rankingList:
         if student != currentStudent:
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
-            similarHours.append((student.displayName, len(similarSched) * 0.5))
+            similarHours.append((student.displayName, len(similarSched) * 0.5, student.contactDetails))
     return similarHours
 
 def merge(L1, L2):

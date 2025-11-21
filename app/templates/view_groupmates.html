@@ -20,10 +20,13 @@
                                 var groupmateTr = document.createElement('tr');
                                 var groupmateName = document.createElement('td');
                                 var groupmateHours = document.createElement('td');
+                                var groupmateContact = document.createElement('td');
                                 groupmateName.appendChild(document.createTextNode(item[0]));
                                 groupmateHours.appendChild(document.createTextNode(item[1]));
+                                groupmateContact.appendChild(document.createTextNode(item[2]));
                                 groupmateTr.appendChild(groupmateName);
                                 groupmateTr.appendChild(groupmateHours);
+                                groupmateTr.appendChild(groupmateContact);
                                 groupmatesTable.appendChild(groupmateTr);
                             }
                             rankingList.forEach(addToGroupList);
@@ -45,6 +48,7 @@
             <tr>
                 <td> Name </td>
                 <td> Similar Hours </td>
+                <td> Contact Details </td>
             </tr>
         </table>
     </body>
