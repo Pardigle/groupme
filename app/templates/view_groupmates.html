@@ -15,11 +15,16 @@
                         .then(response => response.json())
                         .then(data => {
                             const rankingList = data["data"];
-                            var groupmatesUL = document.getElementById('groupmate-rank-list');
+                            var groupmatesTable = document.getElementById('groupmate-rank-table');
                             function addToGroupList(item) {
-                                var groupmateLI = document.createElement('li');
-                                groupmateLI.appendChild(document.createTextNode(item[0]));
-                                groupmatesUL.appendChild(groupmateLI);
+                                var groupmateTr = document.createElement('tr');
+                                var groupmateName = document.createElement('td');
+                                var groupmateHours = document.createElement('td');
+                                groupmateName.appendChild(document.createTextNode(item[0]));
+                                groupmateHours.appendChild(document.createTextNode(item[1]));
+                                groupmateTr.appendChild(groupmateName);
+                                groupmateTr.appendChild(groupmateHours);
+                                groupmatesTable.appendChild(groupmateTr);
                             }
                             rankingList.forEach(addToGroupList);
                         })
@@ -36,7 +41,11 @@
             <option value="chunks"> Chunks </option>
         </select>
         <button id="view-group-button"> View </button>
-        <ul id="groupmate-rank-list">
-        </ul>
+        <table id="groupmate-rank-table">
+            <tr>
+                <td> Name </td>
+                <td> Similar Hours </td>
+            </tr>
+        </table>
     </body>
 </html>
