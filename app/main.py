@@ -135,9 +135,19 @@ def create_student(request : Request, passcode : str):
 
 @api.get("/{passcode}/{student_id}")
 def view_section(request : Request, passcode : str, student_id : int):
+    displayName = ""
+    className = ""
+    if validate_student(passcode, student_id):
+        section = db[passcode]
+        className = section.sectionName
+        classDescription = section.sectionDetails
+        displayName = section.studentList[student_id].displayName
     return templates.TemplateResponse("view_section.html", {"request": request, 
                                                             "passcode": passcode, 
-                                                            "student_id": student_id})
+                                                            "student_id": student_id,
+                                                            "displayName": displayName,
+                                                            "className":className,
+                                                            "classDescription":classDescription})
 
 @api.get("/{passcode}/{student_id}/view_group")
 def view_group(request : Request, passcode : str, student_id : int):

@@ -1,55 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="UTF-8">
-
-        <title> View Groupmates </title>
+{% extends 'base.html' %}
+{% block title %}View Groupmates{% endblock %}
+{% block scripts %}
         <script>
-
             document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('view-group-button').onclick = function(event) {
-                    const algorithmSelected = document.getElementById("select-algorithm").value;
-                    if (algorithmSelected === "cumulative") {
-                        fetch("/api/{{ passcode }}/{{ student_id }}/group_cumulative")
-                        .then(response => response.json())
-                        .then(data => {
-                            const rankingList = data["data"];
-                            var groupmatesTable = document.getElementById('groupmate-rank-table');
-                            function addToGroupList(item) {
-                                var groupmateTr = document.createElement('tr');
-                                var groupmateName = document.createElement('td');
-                                var groupmateHours = document.createElement('td');
-                                var groupmateContact = document.createElement('td');
-                                groupmateName.appendChild(document.createTextNode(item[0]));
-                                groupmateHours.appendChild(document.createTextNode(item[1]));
-                                groupmateContact.appendChild(document.createTextNode(item[2]));
-                                groupmateTr.appendChild(groupmateName);
-                                groupmateTr.appendChild(groupmateHours);
-                                groupmateTr.appendChild(groupmateContact);
-                                groupmatesTable.appendChild(groupmateTr);
-                            }
-                            rankingList.forEach(addToGroupList);
-                        })
+                document.getElementById("search-group").onclick = function(event) {
+                    var groupmatesTable = document.getElementById('groupmate-rank-table');
+                    var method = "group_cumulative";
+                    for (let i = groupmatesTable.rows.length - 1; i > 0; i--) {
+                        groupmatesTable.deleteRow(i);
                     }
+                    if (document.getElementById("method-select").value === "cumulative") {
+                        method = "group_cumulative";
+                    } else if (document.getElementById("method-select").value === "consecutive") {
+                        method = "group_consecutive";
+                    }
+                    fetch(`/api/{{ passcode }}/{{ student_id }}/${method}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const rankingList = data["data"];
+                        var rank = 1;
+                        function addToGroupList(item) {
+                            var groupmateTr = document.createElement('tr');
+                            var groupmateRank = document.createElement('td');
+                            var groupmateName = document.createElement('td');
+                            var groupmateHours = document.createElement('td');
+                            var groupmateContact = document.createElement('td');
+                            groupmateRank.appendChild(document.createTextNode(rank));
+                            groupmateName.appendChild(document.createTextNode(item[0]));
+                            groupmateHours.appendChild(document.createTextNode(item[1]));
+                            groupmateContact.appendChild(document.createTextNode(item[2]));
+                            groupmateTr.appendChild(groupmateRank);
+                            groupmateTr.appendChild(groupmateName);
+                            groupmateTr.appendChild(groupmateHours);
+                            groupmateTr.appendChild(groupmateContact);
+                            groupmatesTable.appendChild(groupmateTr);
+                            rank++;
+                        }
+                        rankingList.forEach(addToGroupList);
+                    });
                 }
             })
-                
-
         </script>
-    </head>
-    <body>
-        <select id="select-algorithm" aria-placeholder="Choose Method">
-            <option value="cumulative"> Cumulative </option>
-            <option value="chunks"> Chunks </option>
-        </select>
-        <button id="view-group-button"> View </button>
-        <table id="groupmate-rank-table">
-            <tr>
-                <td> Name </td>
-                <td> Similar Hours </td>
-                <td> Contact Details </td>
-            </tr>
-        </table>
-    </body>
-</html>
+{% endblock %}
+{% block content %}
+    <content class="d-flex justify-content-center align-items-center flex-grow-1">
+
+        <div id="passcode-view-screen" class="text-center">
+            <h5> Best Groupmate Contenders </h5>
+            <div class="d-flex justify-content-center align-items-center">
+                <select class="form-select" id="method-select">
+                    <option value="cumulative"> Cumulative </option>
+                    <option value="consecutive"> Consecutive </option>
+                </select>
+                <button class="btn btn-outline-success mx-2" id="search-group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="card mt-2">
+                <div class="card-body">
+                    <table class="table" id="groupmate-rank-table">
+                        <tr>
+                            <th scope="col"> # </th>
+                            <th scope="col"> Name </td>
+                            <th scope="col"> Similar Hours </td>
+                            <th scope="col"> Contact Details </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="my-2">
+                <a href="/{{ passcode }}/{{ student_id }}">
+                    <button class="btn btn-outline-success w-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+                        </svg>
+                        Return
+                    </button>
+                </a>
+            </div>
+        </div>
+    </content>
+
+{% endblock %}

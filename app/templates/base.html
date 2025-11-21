@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 75%;">
+<html lang="en" style="height: 100%;">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
@@ -11,7 +11,11 @@
             a, 
             input, 
             h1,
-            h5, 
+            h3,
+            h4,
+            h5,
+            td,
+            th,
             button[type="submit"], 
             input[type="text"], 
             input[type="number"] {
@@ -24,7 +28,7 @@
         {% endblock %}
     </head>
 
-    <body class="d-flex flex-column" style="height: 100%">
+    <body class="d-flex flex-column" style="height: 85%">
         <div>
             <nav class="navbar navbar-light bg-transparent">
                 <a class="navbar-brand px-5 pt-4" href="/">
@@ -35,4 +39,9 @@
         {% block content %}
         {% endblock %}
     </body>
+    <footer style="position: fixed; bottom: 0; width: 100%; padding-top: 20px;">
+        <div class="flex flex-col justify-center items-center text-center text-sm">
+            <p class="text-muted"> Made by Pardigle - vernalterrene </p>
+        </div>
+    </footer>
 </html>

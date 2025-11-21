@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="UTF-8">
-
-        <title> View Section </title>
+{% extends 'base.html' %}
+{% block title %}View Section{% endblock %}
+{% block scripts %}
         <script>
             // original code: https://jsfiddle.net/Brv6J/3/
             // sources used: https://ryfarlane.com/article/toggle-class-vanilla-javascript
@@ -62,7 +58,6 @@
                         let timeCombined = cellDay + cellTime;
                         finalSchedule.push(timeCombined); 
                     });
-                    console.log(finalSchedule);
 
                     const updatedSchedule = {
                         schedule : finalSchedule
@@ -78,7 +73,15 @@
                     .then(response => response.json())
                     .then(data => {
                         const result = data["result"]
-                        alert(result);
+                        if (result === "success") {
+                            var alertToastElement = document.getElementById('alertToast');
+                            var alertMessage = new bootstrap.Toast(alertToastElement);
+                            alertMessage.show();
+                        } else if (result === "error") {
+                            var errorToastElement = document.getElementById('errorToast');
+                            var errorMessage = new bootstrap.Toast(errorToastElement);
+                            errorMessage.show();
+                        }
                     });
                 }
 
@@ -91,28 +94,60 @@
         </script>
         
         <style>
-          .clickable {
-            height: 25px;
-            width:150px;
-            text-align:center;
-            vertical-align:middle;
-            background-color:azure;
-            border:1px solid white;
-          }
-          
-          .time-label, .days_header {
-            background-color: white;
-          }
-          
-          table td.highlighted {
-            background-color: lightgreen;
-          }
+            table {
+                font-size: 12px;
+            }
+
+            td {
+                height: 12px;
+            }
+
+            .clickable {
+                height: 20px;
+                width:150px;
+                text-align:center;
+                vertical-align:middle;
+                background-color:azure;
+                border:1px solid white;
+            }
+
+            .time-label, .days_header {
+                background-color: white;
+            }
+            
+            table td.highlighted {
+                background-color: lightgreen;
+            }
         </style>
-    </head>
-    <body>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <greeting class="mx-5 mt-1">
+        <p class="text-wrap text-muted"> {{ className }} | {{ classDescription }} </p>
+        <h3 style="margin-top: -15px;"> Greetings, {{ displayName }} </h3>
+    </greeting>
+    <actionblock class="d-flex justify-content-end mx-5 p-3">
+        <button class="btn btn-outline-info mx-2" id="save_sched" style="font-family: Quicksand;">
+            Save Schedule
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-plus" viewBox="0 0 16 16">
+                <path d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7"/>
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+            </svg>
+        </button>
+        <button class="btn btn-outline-success" id="group_me" style="font-family: Quicksand;"> 
+            Group Me 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+            </svg>
+        </button>
+    </actionblock>
+</div>
+<hr>
+<content class="d-flex justify-content-center align-items-center flex-grow-1">
+    <div>
         <table id="create-schedule-table">
             <!--custom attributes: https://www.geeksforgeeks.org/html/what-are-custom-attributes-in-html5/-->
-            <tr>
+            <tr class="text-center">
                 <td class="days-header"></td>
                 <td class="days-header">Mon</td>
                 <td class="days-header">Tues</td>
@@ -123,7 +158,7 @@
                 <td class="days-header">Sun</td>
             </tr>
             <tr>
-                <td class="time-label">8:00 AM</td>
+                <td class="time-label text-end">8 AM</td>
                 <td class="clickable" day="M-"   time="800-830"></td>
                 <td class="clickable" day="T-"   time="800-830"></td>
                 <td class="clickable" day="W-"   time="800-830"></td>
@@ -143,7 +178,7 @@
                 <td class="clickable" day="Sun-" time="830-900"></td>
             </tr>
             <tr>
-                <td class="time-label">9:00 AM</td>
+                <td class="time-label">9 AM</td>
                 <td class="clickable" day="M-"   time="900-930"></td>
                 <td class="clickable" day="T-"   time="900-930"></td>
                 <td class="clickable" day="W-"   time="900-930"></td>
@@ -163,7 +198,7 @@
                 <td class="clickable" day="Sun-"  time="930-1000"></td>
             </tr>
             <tr>
-                <td class="time-label">10:00 AM</td>
+                <td class="time-label">10 AM</td>
                 <td class="clickable" day="M-"   time="1000-1030"></td>
                 <td class="clickable" day="T-"   time="1000-1030"></td>
                 <td class="clickable" day="W-"   time="1000-1030"></td>
@@ -183,7 +218,7 @@
                 <td class="clickable" day="Sun-" time="1030-1100"></td>
             </tr>
             <tr>
-                <td class="time-label">11:00 AM</td>
+                <td class="time-label">11 AM</td>
                 <td class="clickable" day="M-"   time="1100-1130"></td>
                 <td class="clickable" day="T-"   time="1100-1130"></td>
                 <td class="clickable" day="W-"   time="1100-1130"></td>
@@ -203,7 +238,7 @@
                 <td class="clickable" day="Sun-" time="1130-1200"></td>
             </tr>
             <tr>
-                <td class="time-label">12:00 PM</td>
+                <td class="time-label">12 PM</td>
                 <td class="clickable" day="M-"   time="1200-1230"></td>
                 <td class="clickable" day="T-"   time="1200-1230"></td>
                 <td class="clickable" day="W-"   time="1200-1230"></td>
@@ -223,7 +258,7 @@
                 <td class="clickable" day="Sun-" time="1230-1300"></td>
             </tr>
             <tr>
-                <td class="time-label">1:00 PM</td>
+                <td class="time-label">1 PM</td>
                 <td class="clickable" day="M-"   time="1300-1330"></td>
                 <td class="clickable" day="T-"   time="1300-1330"></td>
                 <td class="clickable" day="W-"   time="1300-1330"></td>
@@ -243,7 +278,7 @@
                 <td class="clickable" day="Sun-" time="1330-1400"></td>
             </tr>
             <tr>
-                <td class="time-label">2:00 PM</td>
+                <td class="time-label">2 PM</td>
                 <td class="clickable" day="M-"   time="1400-1430"></td>
                 <td class="clickable" day="T-"   time="1400-1430"></td>
                 <td class="clickable" day="W-"   time="1400-1430"></td>
@@ -263,7 +298,7 @@
                 <td class="clickable" day="Sun-" time="1430-1500"></td>
             </tr> 
             <tr>
-                <td class="time-label">3:00 PM</td>
+                <td class="time-label">3 PM</td>
                 <td class="clickable" day="M-"   time="1500-1530"></td>
                 <td class="clickable" day="T-"   time="1500-1530"></td>
                 <td class="clickable" day="W-"   time="1500-1530"></td>
@@ -283,7 +318,7 @@
                 <td class="clickable" day="Sun-" time="1530-1600"></td>
             </tr>
             <tr>
-                <td class="time-label">4:00 PM</td>
+                <td class="time-label">4 PM</td>
                 <td class="clickable" day="M-"   time="1600-1630"></td>
                 <td class="clickable" day="T-"   time="1600-1630"></td>
                 <td class="clickable" day="W-"   time="1600-1630"></td>
@@ -303,7 +338,7 @@
                 <td class="clickable" day="Sun-" time="1630-1700"></td>
             </tr>
             <tr>
-                <td class="time-label">5:00 PM</td>
+                <td class="time-label">5 PM</td>
                 <td class="clickable" day="M-"   time="1700-1730"></td>
                 <td class="clickable" day="T-"   time="1700-1730"></td>
                 <td class="clickable" day="W-"   time="1700-1730"></td>
@@ -323,7 +358,7 @@
                 <td class="clickable" day="Sun-" time="1730-1800"></td>
             </tr>
             <tr>
-                <td class="time-label">6:00 PM</td>
+                <td class="time-label">6 PM</td>
                 <td class="clickable" day="M-"   time="1800-1830"></td>
                 <td class="clickable" day="T-"   time="1800-1830"></td>
                 <td class="clickable" day="W-"   time="1800-1830"></td>
@@ -343,7 +378,7 @@
                 <td class="clickable" day="Sun-" time="1830-1900"></td>
             </tr>
             <tr>
-                <td class="time-label">7:00 PM</td>
+                <td class="time-label">7 PM</td>
                 <td class="clickable" day="M-"   time="1900-1930"></td>
                 <td class="clickable" day="T-"   time="1900-1930"></td>
                 <td class="clickable" day="W-"   time="1900-1930"></td>
@@ -363,7 +398,26 @@
                 <td class="clickable" day="Sun-" time="1930-2000"></td>
             </tr>
         </table>
-        <button id="save_sched">Save Schedule</button>
-        <button id="group_me"> Group Me </button>
-    </body>
-</html>
+    </div>
+</content>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+    <div id="alertToast" class="toast align-items-center border-0 bg-info text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+        <div class="d-flex">
+            <div class="toast-body fs-6 fw-semibold">
+                Saved successfully.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+    <div id="errorToast" class="toast align-items-center border-0 bg-warning text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+        <div class="d-flex">
+            <div class="toast-body fs-6 fw-semibold">
+                Encountered error saving.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
