@@ -2,7 +2,6 @@
 {% block title %} Home {% endblock %}
 {% block scripts %}
         <script>
-
             document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('join-section-form').onsubmit = function(event) {
                     event.preventDefault();
@@ -20,38 +19,31 @@
                             alertMessage.show();
                         }
                     });
-                    
                 }
             });
         </script>
 {% endblock %}
 {% block content %}
-        
-        <content class="d-flex justify-content-center align-items-center flex-grow-1">
-            
-            <div class="text-center"> 
-                
-                <h5> Join a Class </h5>
-                
-                <form class="d-flex justify-content-center my-2" method="post" id="join-section-form">
-                    <input class="form-control mx-1" id="passcode" type="text" placeholder="Enter your class code" required>
-                    <button class="btn btn-outline-success" type="submit"> Join </button>
-                </form>
-                
-                <div>
-                    <a class="text-success" href="/create_section"> or create a new section </a>
-                </div>
-                
-            </div>
-        </content>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
-            <div id="alertToast" class="toast align-items-center border-0 bg-danger text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-                <div class="d-flex">
-                    <div class="toast-body fs-6 fw-semibold">
-                        Invalid class code.
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
+    <content class="d-flex justify-content-center align-items-center flex-grow-1">
+        <div class="text-center"> 
+            <h5> Join a Class </h5>
+            <form class="d-flex justify-content-center my-2" method="post" id="join-section-form">
+                <input class="form-control mx-1" id="passcode" type="text" placeholder="Enter your class code" required>
+                <button class="btn btn-outline-success" type="submit"> Join </button>
+            </form>
+            <div>
+                <a class="text-success" href="/create_section"> or create a new section </a>
             </div>
         </div>
+    </content>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div id="alertToast" class="toast align-items-center border-0 bg-danger text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+            <div class="d-flex">
+                <div class="toast-body fs-6 fw-semibold">
+                    Invalid class code.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
 {% endblock %}

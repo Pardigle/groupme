@@ -2,7 +2,6 @@
 {% block title %}Create Student{% endblock %}
 {% block scripts %}
         <script>
-
             document.addEventListener('DOMContentLoaded', function() {
 
                 document.getElementById('create-student-form').onsubmit = function() {
@@ -30,9 +29,7 @@
                         window.location.href = `/${passcode}/${student_id}`;
                     });
                 }
-
             })
-
         </script>
 {% endblock %}
 {% block content %}

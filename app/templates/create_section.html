@@ -2,7 +2,6 @@
 {% block title %}Create Section{% endblock %}
 {% block scripts %}
         <script>
-
             document.addEventListener('DOMContentLoaded', function() {
                 var creationScreen = document.getElementById("creation-screen");
                 var passcodeScreen = document.getElementById("passcode-view-screen");
@@ -39,25 +38,18 @@
                         passcodeText.innerText = passcode;
                     });
                 }
-
             })
-
         </script>
 {% endblock %}
 {% block content %}
-        
         <content class="d-flex justify-content-center align-items-center flex-grow-1">
-            
             <div id="creation-screen" class="text-center" hidden> 
-                
                 <h5> Create a Class </h5>
-                
                 <form class="justify-content-center my-2" method="post" id="create-section-form">
                     <div>
                         <input class="form-control mx-1 my-2" id="create-section-name" type="text" placeholder="Name your class" required>
                     </div>
                     <div>
-
                     </div>
                     <textarea class="form-control mx-1 my-2" id="create-section-description" placeholder="Description" style="font-family: Quicksand; min-height: 50px;"></textarea>
                     <input class="form-control mx-1 my-2" id="create-section-maxsize" type="number" placeholder="Max Size" min="1" max="500" required>
@@ -68,23 +60,14 @@
                         </svg>
                     </button>
                 </form>
-                
             </div>
-
             <div id="passcode-view-screen" class="text-center">
-                
                 <h5> <u>Remember</u> your class code </h5>
-
                 <div class="card my-2">
-
                     <div class="card-body">
-
                         <h1 id="passcode-display"></h1>
-
                     </div>
-
                 </div>
-
                 <a href="/">
                     <button class="btn btn-outline-success">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
@@ -93,8 +76,6 @@
                         Return
                     </button>
                 </a>
-
             </div>
-
         </content>
 {% endblock %}

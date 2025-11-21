@@ -1,124 +1,124 @@
 {% extends 'base.html' %}
 {% block title %}View Section{% endblock %}
 {% block scripts %}
-        <script>
-            // original code: https://jsfiddle.net/Brv6J/3/
-            // sources used: https://ryfarlane.com/article/toggle-class-vanilla-javascript
-            // https://developer.mozilla.org/en-US/docs/Web/API/Element/mousedown_event 
-            // https://www.w3schools.com/jsref/event_preventdefault.asp
+    <script>
+        // original code: https://jsfiddle.net/Brv6J/3/
+        // sources used: https://ryfarlane.com/article/toggle-class-vanilla-javascript
+        // https://developer.mozilla.org/en-US/docs/Web/API/Element/mousedown_event 
+        // https://www.w3schools.com/jsref/event_preventdefault.asp
 
-            document.addEventListener('DOMContentLoaded', function() {
-                // FUNCTIONALITY FOR HIGHLIGHTING CELLS
-                let isHighlighted = false;
-                let cursorClicked = false;
-                let cells = document.querySelectorAll("#create-schedule-table .clickable");
-                let currentlyClicked;
+        document.addEventListener('DOMContentLoaded', function() {
+            // FUNCTIONALITY FOR HIGHLIGHTING CELLS
+            let isHighlighted = false;
+            let cursorClicked = false;
+            let cells = document.querySelectorAll("#create-schedule-table .clickable");
+            let currentlyClicked;
 
-                var existingSchedule = new Array();
+            var existingSchedule = new Array();
 
-                fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
+            fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
+            .then(response => response.json())
+            .then(data => {
+                existingSchedule = data["schedule"];
+                cells.forEach(function(cell) {
+                if (existingSchedule.includes(cell.getAttribute('day') + cell.getAttribute('time'))) {
+                    cell.classList.toggle("highlighted");
+                }})
+            })
+
+            cells.forEach(function(cell) {
+                cell.addEventListener('mousedown', function(event) {
+                    cursorClicked = true;
+                    this.classList.toggle("highlighted");
+                    isHighlighted = this.classList.contains("highlighted");
+                    event.preventDefault();
+                });
+
+                cell.addEventListener('mouseover', function() {
+                    if (cursorClicked) {
+                        this.classList.toggle("highlighted", isHighlighted);
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    cursorClicked = false;
+                })
+            })
+
+            // FUNCTIONALITY FOR SUBMITTING
+            const submit = document.querySelector("#save_sched")
+
+            submit.onclick = function(event){
+                const finalSchedule = new Array();
+                const selectedCells = document.querySelectorAll(".highlighted");
+
+                selectedCells.forEach(function(cell){
+                    let cellDay = cell.getAttribute("day");
+                    let cellTime = cell.getAttribute("time");
+                    let timeCombined = cellDay + cellTime;
+                    finalSchedule.push(timeCombined); 
+                });
+
+                const updatedSchedule = {
+                    schedule : finalSchedule
+                }
+
+                fetch("/api/{{ passcode }}/{{ student_id }}/update_schedule", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedSchedule)
+                })
                 .then(response => response.json())
                 .then(data => {
-                    existingSchedule = data["schedule"];
-                    cells.forEach(function(cell) {
-                    if (existingSchedule.includes(cell.getAttribute('day') + cell.getAttribute('time'))) {
-                        cell.classList.toggle("highlighted");
-                    }})
-                })
-
-                cells.forEach(function(cell) {
-                    cell.addEventListener('mousedown', function(event) {
-                        cursorClicked = true;
-                        this.classList.toggle("highlighted");
-                        isHighlighted = this.classList.contains("highlighted");
-                        event.preventDefault();
-                    });
-
-                    cell.addEventListener('mouseover', function() {
-                        if (cursorClicked) {
-                            this.classList.toggle("highlighted", isHighlighted);
-                        }
-                    });
-
-                    document.addEventListener('mouseup', function() {
-                        cursorClicked = false;
-                    })
-                })
-
-                // FUNCTIONALITY FOR SUBMITTING
-                const submit = document.querySelector("#save_sched")
-
-                submit.onclick = function(event){
-                    const finalSchedule = new Array();
-                    const selectedCells = document.querySelectorAll(".highlighted");
-
-                    selectedCells.forEach(function(cell){
-                        let cellDay = cell.getAttribute("day");
-                        let cellTime = cell.getAttribute("time");
-                        let timeCombined = cellDay + cellTime;
-                        finalSchedule.push(timeCombined); 
-                    });
-
-                    const updatedSchedule = {
-                        schedule : finalSchedule
+                    const result = data["result"]
+                    if (result === "success") {
+                        var alertToastElement = document.getElementById('alertToast');
+                        var alertMessage = new bootstrap.Toast(alertToastElement);
+                        alertMessage.show();
+                    } else if (result === "error") {
+                        var errorToastElement = document.getElementById('errorToast');
+                        var errorMessage = new bootstrap.Toast(errorToastElement);
+                        errorMessage.show();
                     }
+                });
+            }
 
-                    fetch("/api/{{ passcode }}/{{ student_id }}/update_schedule", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(updatedSchedule)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const result = data["result"]
-                        if (result === "success") {
-                            var alertToastElement = document.getElementById('alertToast');
-                            var alertMessage = new bootstrap.Toast(alertToastElement);
-                            alertMessage.show();
-                        } else if (result === "error") {
-                            var errorToastElement = document.getElementById('errorToast');
-                            var errorMessage = new bootstrap.Toast(errorToastElement);
-                            errorMessage.show();
-                        }
-                    });
-                }
+            const groupMe = document.getElementById('group_me');
+            groupMe.onclick = function(event){
+                window.location.href = "/{{ passcode }}/{{ student_id }}/view_group";
+            }
 
-                const groupMe = document.getElementById('group_me');
-                groupMe.onclick = function(event){
-                    window.location.href = "/{{ passcode }}/{{ student_id }}/view_group";
-                }
+        });
+    </script>
+    
+    <style>
+        table {
+            font-size: 12px;
+        }
 
-            });
-        </script>
+        td {
+            height: 12px;
+        }
+
+        .clickable {
+            height: 20px;
+            width:150px;
+            text-align:center;
+            vertical-align:middle;
+            background-color:azure;
+            border:1px solid white;
+        }
+
+        .time-label, .days_header {
+            background-color: white;
+        }
         
-        <style>
-            table {
-                font-size: 12px;
-            }
-
-            td {
-                height: 12px;
-            }
-
-            .clickable {
-                height: 20px;
-                width:150px;
-                text-align:center;
-                vertical-align:middle;
-                background-color:azure;
-                border:1px solid white;
-            }
-
-            .time-label, .days_header {
-                background-color: white;
-            }
-            
-            table td.highlighted {
-                background-color: lightgreen;
-            }
-        </style>
+        table td.highlighted {
+            background-color: lightgreen;
+        }
+    </style>
 {% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
