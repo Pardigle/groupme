@@ -3,13 +3,19 @@
 {% block scripts %}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                const passcode = "{{ passcode }}";
+
+                const storedStudentID = localStorage.getItem(passcode);
+
+                if (storedStudentID) {
+                    window.location.href = `/${passcode}/${storedStudentID}`;
+                }
 
                 document.getElementById('create-student-form').onsubmit = function() {
                     event.preventDefault();
                     
                     const name = document.getElementById('create-student-name').value;
                     const contact = document.getElementById('create-student-contact').value;
-                    const passcode = "{{ passcode }}";
 
                     const newStudent = {
                         displayName: name,
@@ -26,6 +32,7 @@
                     .then(response => response.json())
                     .then(data => {
                         const student_id = data["student_id"];
+                        localStorage.setItem(passcode, student_id);
                         window.location.href = `/${passcode}/${student_id}`;
                     });
                 }
