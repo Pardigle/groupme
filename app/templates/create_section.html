@@ -10,6 +10,7 @@
                 creationScreen.hidden = false;
                 passcodeScreen.hidden = true;
 
+                // Create section form submitted -> Fetch 'api/create_section' -> Reveal passcode screen.
                 document.getElementById('create-section-form').onsubmit = function() {
                     event.preventDefault();
                     

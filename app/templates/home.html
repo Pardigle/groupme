@@ -3,6 +3,8 @@
 {% block scripts %}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+
+                // Entered passcode -> Verify if passcode exists -> Redirect student to create_student url.
                 document.getElementById('join-section-form').onsubmit = function(event) {
                     event.preventDefault();
                     const passcode = document.getElementById('passcode').value;

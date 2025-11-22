@@ -19,9 +19,10 @@
             var studentList = new Array();
             var sortedStudentList = [];
 
+            // Update table containing class list.
             function updateClassListDisplay(classList) {
                 classListDisplay.innerHTML = "";
-                if (classList.length===0) {
+                if (classList.length === 0) {
                     const newRow = classListDisplay.insertRow();
                     const emptyCell = newRow.insertCell();
                     emptyCell.innerHTML = "No people found"
@@ -35,6 +36,7 @@
                 })
             }
 
+            // Client-side binary search.
             function binarySearch(nameList, name) {
                 let low = 0;
                 let high = nameList.length;
@@ -50,6 +52,7 @@
                 return low;
             }
 
+            // Call api to get classmate names -> Sort the names to allow for binary search.
             fetch("/api/{{ passcode }}/{{ student_id }}/get_classmate_names")
             .then(response => response.json())
             .then(data => {
@@ -58,6 +61,7 @@
                 sortedStudentList = studentList.sort();
             })
 
+            // Prepopulate the schedule table if student has saved any.
             fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
             .then(response => response.json())
             .then(data => {
@@ -73,8 +77,8 @@
                 console.error("Error fetching student schedule:", error);
             });
 
+            // Behavior for schedule table.
             cells.forEach(function(cell) {
-
                 cell.addEventListener('mousedown', function(event) {
                     cursorClicked = true;
                     this.classList.toggle("highlighted");
@@ -157,16 +161,10 @@
                 });
             }
 
-            
-
-            
-
-
             const groupMe = document.getElementById('group_me');
             groupMe.onclick = function(event){
                 window.location.href = "/{{ passcode }}/{{ student_id }}/view_group";
             }
-
         });
     </script>
     

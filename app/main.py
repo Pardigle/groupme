@@ -233,6 +233,11 @@ def view_section(request : Request, passcode : str, student_id : int):
 def view_group(request : Request, passcode : str, student_id : int):
     """View options for groupings."""
     if validate_student(passcode, student_id):
+        section = db[passcode]
+        student = section.studentList[student_id]
+        schedule = student.schedule
+        if not schedule:
+            return RedirectResponse(f"/{passcode}/{student_id}")
         return templates.TemplateResponse("view_groupmates.html", {"request": request, 
                                                             "passcode": passcode, 
                                                             "student_id": student_id})

@@ -4,19 +4,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
-                .then(response => response.json())
-                .then(data => {
-                    existingSchedule = data["schedule"];
-                    console.log(existingSchedule);
-                    if (!Array.isArray(existingSchedule)) {
-                        window.location.href = "/{{ passcode }}/{{ student_id }}";
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching student schedule:", error);
-                });
-
+                // Press search -> Fetch api for cumulative/consecutive -> Appends ranked classmates if any.
                 document.getElementById("search-group").onclick = function(event) {
                     var groupmatesTable = document.getElementById('groupmate-rank-table');
                     var method = "group_cumulative";
