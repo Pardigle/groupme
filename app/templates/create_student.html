@@ -15,10 +15,11 @@
                     event.preventDefault();
                     
                     const name = document.getElementById('create-student-name').value;
+                    const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
                     const contact = document.getElementById('create-student-contact').value;
 
                     const newStudent = {
-                        displayName: name,
+                        displayName: capitalizedName,
                         contactDetails: contact,
                     }
 

@@ -147,21 +147,19 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
             similarSched = sorted(list(similarSched))
-
             maxLength = 0
-            currentChunkLength = 0.5
-
-            for slotIndex in range(0, len(similarSched)-1):
-                currentDay, _, currentEnd = similarSched[slotIndex].split("-")
-                nextDay, nextStart, _ = similarSched[slotIndex+1].split("-")
-                if currentDay == nextDay and nextStart == currentEnd:
-                    currentChunkLength += 0.5
-                else:
-                    if currentChunkLength > maxLength:
-                        maxLength = currentChunkLength
-                    currentChunkLength = 0.5
-
-            maxLength = max(currentChunkLength, maxLength)
+            if similarSched:
+                currentChunkLength = 0.5
+                for slotIndex in range(0, len(similarSched)-1):
+                    currentDay, currentStart, currentEnd = similarSched[slotIndex].split("-")
+                    nextDay, nextStart, nextEnd = similarSched[slotIndex+1].split("-")
+                    if currentDay == nextDay and nextStart == currentEnd:
+                        currentChunkLength += 0.5
+                    else:
+                        if currentChunkLength > maxLength:
+                            maxLength = currentChunkLength
+                        currentChunkLength = 0.5
+                maxLength = max(currentChunkLength, maxLength)
             allStudentsChunks.append((student.displayName, maxLength, student.contactDetails))
     return allStudentsChunks
 

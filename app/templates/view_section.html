@@ -8,16 +8,25 @@
         // https://www.w3schools.com/jsref/event_preventdefault.asp
 
         document.addEventListener('DOMContentLoaded', function() {
-            // FUNCTIONALITY FOR HIGHLIGHTING CELLS
             let isHighlighted = false;
             let cursorClicked = false;
             let cells = document.querySelectorAll("#create-schedule-table .clickable");
             let classListDisplay = document.getElementById("class-list-display");
+            let searchInput = document.getElementById("search-name-input");
+            let searchButton = document.getElementById("search-name-button");
             let currentlyClicked;
             var existingSchedule = new Array();
             var studentList = new Array();
+            var sortedStudentList = [];
 
             function updateClassListDisplay(classList) {
+                classListDisplay.innerHTML = "";
+                if (classList.length===0) {
+                    const newRow = classListDisplay.insertRow();
+                    const emptyCell = newRow.insertCell();
+                    emptyCell.innerHTML = "No people found"
+                    return;
+                }
                 classList.forEach(item => {
                     const newRow = classListDisplay.insertRow();
                     const classmateCell = newRow.insertCell();
@@ -26,11 +35,27 @@
                 })
             }
 
+            function binarySearch(nameList, name) {
+                let low = 0;
+                let high = nameList.length;
+                while (low<high) {
+                    let mid = Math.floor((low+high)/2);
+                    if (nameList[mid] < name) {
+                        low = mid + 1;
+                    }
+                    else {
+                        high = mid;
+                    }
+                }
+                return low;
+            }
+
             fetch("/api/{{ passcode }}/{{ student_id }}/get_classmate_names")
             .then(response => response.json())
             .then(data => {
                 const studentList = data["studentList"];
                 updateClassListDisplay(studentList);
+                sortedStudentList = studentList.sort();
             })
 
             fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
@@ -67,6 +92,30 @@
                     cursorClicked = false;
                 })
             })
+            
+            // FUNCTIONALITY FOR SEARCH BAR
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    let searchInputText = searchInput.value.trim();
+                    searchQuery = searchInputText.charAt(0).toUpperCase() + searchInputText.slice(1);
+                    if (searchQuery==="") {
+                        updateClassListDisplay(sortedStudentList);
+                        return;
+                    }
+                    let matches = [];
+                    let startIndex = binarySearch(sortedStudentList, searchQuery);
+                    for (let i = startIndex; i <sortedStudentList.length; i++){
+                        let name = sortedStudentList[i];
+                        if (name.startsWith(searchQuery)){
+                            matches.push(name);
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    updateClassListDisplay(matches);
+                    });
+                }
 
             // FUNCTIONALITY FOR SUBMITTING
             const submit = document.querySelector("#save_sched")
@@ -107,6 +156,11 @@
                     }
                 });
             }
+
+            
+
+            
+
 
             const groupMe = document.getElementById('group_me');
             groupMe.onclick = function(event){
