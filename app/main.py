@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.exceptions import HTTPException
 from passcodes import create_passcode
 from models import Student, Section, ScheduleUpdate
 import uvicorn
@@ -36,10 +37,12 @@ def api_create_section(newSection : Section):
 def api_create_student(passcode : str, newStudent : Student):
     """Create a student and match it with a student id."""
     if passcode in db:
-        studentList = db[passcode].studentList
-        student_id = len(studentList)
-        studentList.append(newStudent)
-        return {'student_id':student_id}
+        section = db[passcode]
+        studentList = section.studentList
+        if section.maxSize > len(studentList):
+            student_id = len(studentList)
+            studentList.append(newStudent)
+            return {'student_id':student_id}
 
 @app.get("/api/{passcode}/{student_id}/view_schedule")
 def api_view_schedule(passcode : str, student_id : int):
@@ -207,32 +210,40 @@ def create_section(request : Request):
 @app.get("/{passcode}/create_student", response_class=HTMLResponse)
 def create_student(request : Request, passcode : str):
     """View create student screen."""
-    return templates.TemplateResponse("create_student.html", {"request": request, 
+    if passcode in db:
+        return templates.TemplateResponse("create_student.html", {"request": request, 
                                                               "passcode":passcode})
+    return templates.TemplateResponse("error_page.html", {"request":request})
 
-@app.get("/{passcode}/{student_id}")
+@app.get("/{passcode}/{student_id}", response_class=HTMLResponse)
 def view_section(request : Request, passcode : str, student_id : int):
     """View schedule-table and section screen."""
-    displayName = ""
-    className = ""
     if validate_student(passcode, student_id):
         section = db[passcode]
         className = section.sectionName
         classDescription = section.sectionDetails
         displayName = section.studentList[student_id].displayName
-    return templates.TemplateResponse("view_section.html", {"request": request, 
+        return templates.TemplateResponse("view_section.html", {"request": request, 
                                                             "passcode": passcode, 
                                                             "student_id": student_id,
                                                             "displayName": displayName,
                                                             "className":className,
                                                             "classDescription":classDescription})
+    return templates.TemplateResponse("error_page.html", {"request":request})
 
-@app.get("/{passcode}/{student_id}/view_group")
+@app.get("/{passcode}/{student_id}/view_group", response_class=HTMLResponse)
 def view_group(request : Request, passcode : str, student_id : int):
     """View options for groupings."""
-    return templates.TemplateResponse("view_groupmates.html", {"request": request, 
+    if validate_student(passcode, student_id):
+        return templates.TemplateResponse("view_groupmates.html", {"request": request, 
                                                             "passcode": passcode, 
                                                             "student_id": student_id})
+    return templates.TemplateResponse("error_page.html", {"request":request})
+
+@app.exception_handler(404)
+def catch_errors(request : Request, exc: HTTPException):
+    """Catch all for non-existent pages."""
+    return RedirectResponse("/")
 
 if __name__ == "__main__":
     uvicorn.run(app)

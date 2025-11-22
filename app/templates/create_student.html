@@ -31,23 +31,39 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        const student_id = data["student_id"];
-                        localStorage.setItem(passcode, student_id);
-                        window.location.href = `/${passcode}/${student_id}`;
+                        if (data) {
+                            const student_id = data["student_id"];
+                            localStorage.setItem(passcode, student_id);
+                            window.location.href = `/${passcode}/${student_id}`;
+                        } else {
+                            var errorToastElement = document.getElementById('errorToast');
+                            var errorMessage = new bootstrap.Toast(errorToastElement);
+                            errorMessage.show();
+                        }
                     });
                 }
             })
         </script>
 {% endblock %}
 {% block content %}
-    <content class="d-flex justify-content-center align-items-center flex-grow-1" style="margin-top: -3%;">
-        <div class="text-center"> 
-            <h5> How do you want to be displayed as? </h5>
-            <form class="form" method="post" id="create-student-form">
-                <input class="form-control my-2" id="create-student-name" type="text" placeholder="Display Name" required>
-                <input class="form-control my-2" id="create-student-contact" type="text" placeholder="Contact Details" required>
-            <button class="btn btn-outline-success w-100" id="create-student-submit" type="submit"> Join </button>
-            </form>
+<content class="d-flex justify-content-center align-items-center flex-grow-1" style="margin-top: -3%;">
+    <div class="text-center"> 
+        <h5> How do you want to be displayed as? </h5>
+        <form class="form" method="post" id="create-student-form">
+            <input class="form-control my-2" id="create-student-name" type="text" placeholder="Display Name" required>
+            <input class="form-control my-2" id="create-student-contact" type="text" placeholder="Contact Details" required>
+        <button class="btn btn-outline-success w-100" id="create-student-submit" type="submit"> Join </button>
+        </form>
+    </div>
+</content>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2;">
+    <div id="errorToast" class="toast align-items-center border-0 bg-warning text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+        <div class="d-flex">
+            <div class="toast-body fs-6 fw-semibold">
+                Class is full.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
-    </content>
+    </div>
+</div>
 {% endblock %}

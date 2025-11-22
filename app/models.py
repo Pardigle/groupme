@@ -22,7 +22,7 @@ class Section(BaseModel):
     studentList: List of Students joined in section
     """
     sectionName : str
-    sectionDetails : str
+    sectionDetails : str = ""
     maxSize : int
     studentList : list[Student] = []
 
