@@ -5,11 +5,11 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const passcode = "{{ passcode }}";
 
-                const storedStudentID = localStorage.getItem(passcode);
+                //const storedStudentID = localStorage.getItem(passcode);
 
-                if (storedStudentID) {
-                    window.location.href = `/${passcode}/${storedStudentID}`;
-                }
+                //if (storedStudentID) {
+                    //window.location.href = `/${passcode}/${storedStudentID}`;
+                //}
 
                 document.getElementById('create-student-form').onsubmit = function() {
                     event.preventDefault();

@@ -12,9 +12,26 @@
             let isHighlighted = false;
             let cursorClicked = false;
             let cells = document.querySelectorAll("#create-schedule-table .clickable");
+            let classListDisplay = document.getElementById("class-list-display");
             let currentlyClicked;
-
             var existingSchedule = new Array();
+            var studentList = new Array();
+
+            function updateClassListDisplay(classList) {
+                classList.forEach(item => {
+                    const newRow = classListDisplay.insertRow();
+                    const classmateCell = newRow.insertCell();
+                    const classmateName = document.createTextNode(item);
+                    classmateCell.appendChild(classmateName);
+                })
+            }
+
+            fetch("/api/{{ passcode }}/{{ student_id }}/get_classmate_names")
+            .then(response => response.json())
+            .then(data => {
+                const studentList = data["studentList"];
+                updateClassListDisplay(studentList);
+            })
 
             fetch("/api/{{ passcode }}/{{ student_id }}/view_schedule")
             .then(response => response.json())
@@ -110,7 +127,7 @@
 
         .clickable {
             height: 20px;
-            width:150px;
+            width: 120px;
             text-align:center;
             vertical-align:middle;
             background-color:azure;
@@ -149,7 +166,7 @@
     </actionblock>
 </div>
 <content class="d-flex justify-content-center align-items-center flex-grow-1">
-    <div>
+    <div class="mx-3">
         <table id="create-schedule-table">
             <tr class="text-center">
                 <td class="days-header"></td>
@@ -402,6 +419,25 @@
                 <td class="clickable" day="6-" time="1930-2000"></td>
             </tr>
         </table>
+    </div>
+    <div class="w-25 h-100 d-flex flex-column justify-content-center mx-3">
+        <div class="d-flex align-items-center">
+            <input class="form-control" id="search-name-input" type="text" placeholder="Search name">
+            <button class="btn btn-outline-success mx-2" id="search-name-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                </svg>
+            </button>
+        </div>
+        <div class="card mt-2 h-75">
+            <div class="card-body">
+                <h5 class="fs-5"> Classmates </h5>
+                <div class="h-75 overflow-auto">
+                    <table class="table" id="class-list-display" style="overflow-y: scroll;">
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </content>
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2;">

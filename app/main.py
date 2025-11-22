@@ -59,6 +59,12 @@ def api_update_schedule(passcode : str, student_id : int, update : ScheduleUpdat
         return {'result':'success'}
     return {'result':'error'}
 
+@app.get("/api/{passcode}/{student_id}/get_classmate_names")
+def api_get_studentlist(passcode : str, student_id : int):
+    if passcode in db:
+        section = db[passcode]
+        studentList = [i.displayName for i in section.studentList[:student_id:]]
+        return {'studentList': studentList}
 
 @app.get("/api/{passcode}/verify")
 def api_verify_passcode(passcode : str):
@@ -96,7 +102,6 @@ def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
     similarHours = []
     rankingList = currentSection.studentList
     studentSched = currentStudent.schedule
-    student_id = 0
     for student in rankingList:
         if student != currentStudent:
             comparedSched = student.schedule
@@ -108,7 +113,6 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
     allStudentsChunks = []
     rankingList = currentSection.studentList
     studentSched = currentStudent.schedule
-    student_id = 0
     for student in rankingList:
         if student != currentStudent:
             comparedSched = student.schedule
