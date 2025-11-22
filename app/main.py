@@ -29,9 +29,11 @@ def api_view_section(passcode : str):
 
 @app.post("/api/create_section")
 def api_create_section(newSection : Section):
-    passcode = create_passcode()
-    db[passcode] = newSection
-    return {'passcode':passcode}
+    while True:
+        passcode = create_passcode()
+        if passcode not in db:
+            db[passcode] = newSection
+            return {'passcode':passcode}
 
 @app.post("/api/{passcode}/create_student")
 def api_create_student(passcode : str, newStudent : Student):
