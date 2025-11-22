@@ -20,13 +20,19 @@
             .then(response => response.json())
             .then(data => {
                 existingSchedule = data["schedule"];
-                cells.forEach(function(cell) {
-                if (existingSchedule.includes(cell.getAttribute('day') + cell.getAttribute('time'))) {
-                    cell.classList.toggle("highlighted");
-                }})
+                if (existingSchedule instanceof Array) {
+                    cells.forEach(function(cell) {
+                    if (existingSchedule.includes(cell.getAttribute('day') + cell.getAttribute('time'))) {
+                        cell.classList.toggle("highlighted");
+                    }})
+                }
             })
+            .catch(error => {
+                console.error("Error fetching student schedule:", error);
+            });
 
             cells.forEach(function(cell) {
+
                 cell.addEventListener('mousedown', function(event) {
                     cursorClicked = true;
                     this.classList.toggle("highlighted");
@@ -142,7 +148,6 @@
         </button>
     </actionblock>
 </div>
-<hr>
 <content class="d-flex justify-content-center align-items-center flex-grow-1">
     <div>
         <table id="create-schedule-table">
@@ -400,7 +405,7 @@
         </table>
     </div>
 </content>
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2;">
     <div id="alertToast" class="toast align-items-center border-0 bg-info text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
         <div class="d-flex">
             <div class="toast-body fs-6 fw-semibold">
@@ -410,7 +415,7 @@
         </div>
     </div>
 </div>
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2;">
     <div id="errorToast" class="toast align-items-center border-0 bg-warning text-white" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
         <div class="d-flex">
             <div class="toast-body fs-6 fw-semibold">

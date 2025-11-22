@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" style="height: 100%;">
     <head>
+        <link rel="icon" type="image/svg+xml" href="{{ url_for('static', path='/templates/logo/GroupMeLogo.svg') }}" height="30" alt="Logo">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
         <title> {% block title %}{% endblock %}</title>
@@ -28,7 +29,7 @@
         {% endblock %}
     </head>
 
-    <body class="d-flex flex-column" style="height: 85%">
+    <body class="d-flex flex-column" style="height: 100%">
         <div>
             <nav class="navbar navbar-light bg-transparent">
                 <a class="navbar-brand px-5 pt-4" href="/">
@@ -39,7 +40,7 @@
         {% block content %}
         {% endblock %}
     </body>
-    <footer style="position: fixed; bottom: 0; width: 100%; padding-top: 20px;">
+    <footer class="flex" style="position: relative;bottom: 0; width: 100%; padding-top: 10px;">
         <div class="flex flex-col justify-center items-center text-center text-sm">
             <p class="text-muted"> Made by Pardigle - vernalterrene </p>
         </div>

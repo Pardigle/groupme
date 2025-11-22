@@ -42,14 +42,12 @@
         </script>
 {% endblock %}
 {% block content %}
-        <content class="d-flex justify-content-center align-items-center flex-grow-1">
-            <div id="creation-screen" class="text-center" hidden> 
+        <content class="d-flex justify-content-center align-items-center flex-grow-1" style="margin-top: -3%;">
+            <div id="creation-screen" class="text-center"> 
                 <h5> Create a Class </h5>
                 <form class="justify-content-center my-2" method="post" id="create-section-form">
                     <div>
                         <input class="form-control mx-1 my-2" id="create-section-name" type="text" placeholder="Name your class" required>
-                    </div>
-                    <div>
                     </div>
                     <textarea class="form-control mx-1 my-2" id="create-section-description" placeholder="Description" style="font-family: Quicksand; min-height: 50px;"></textarea>
                     <input class="form-control mx-1 my-2" id="create-section-maxsize" type="number" placeholder="Max Size" min="1" max="500" required>
@@ -61,7 +59,7 @@
                     </button>
                 </form>
             </div>
-            <div id="passcode-view-screen" class="text-center">
+            <div id="passcode-view-screen" class="text-center" hidden>
                 <h5> <u>Remember</u> your class code </h5>
                 <div class="card my-2">
                     <div class="card-body">
