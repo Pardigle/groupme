@@ -6,13 +6,16 @@
                 document.getElementById("search-group").onclick = function(event) {
                     var groupmatesTable = document.getElementById('groupmate-rank-table');
                     var method = "group_cumulative";
+                    var thTime = document.getElementById('th-time');
                     for (let i = groupmatesTable.rows.length - 1; i > 0; i--) {
                         groupmatesTable.deleteRow(i);
                     }
                     if (document.getElementById("method-select").value === "cumulative") {
                         method = "group_cumulative";
+                        thTime.innerText = "Total Similar Hours";
                     } else if (document.getElementById("method-select").value === "consecutive") {
                         method = "group_consecutive";
+                        thTime.innerText = "Largest Chunk in Hours";
                     }
                     fetch(`/api/{{ passcode }}/{{ student_id }}/${method}`)
                     .then(response => response.json())
@@ -64,7 +67,7 @@
                         <tr>
                             <th scope="col"> # </th>
                             <th scope="col"> Name </td>
-                            <th scope="col"> Similar Hours </td>
+                            <th scope="col" id="th-time"> Similar Hours </td>
                             <th scope="col"> Contact Details </td>
                         </tr>
                     </table>
