@@ -6,28 +6,28 @@ from passcodes import create_passcode
 from models import Student, Section, ScheduleUpdate
 import uvicorn
 
-api = FastAPI()
+app = FastAPI()
 
-api.mount("/static", StaticFiles(directory="app"), name="static")
+app.mount("/logo-assets", StaticFiles(directory="templates/logo"), name="static")
 
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="templates")
 
 db = {}
 
 # BACKEND
 
-@api.get("/api/{passcode}")
+@app.get("/api/{passcode}")
 def api_view_section(passcode : str):
     if passcode in db:
         return db[passcode].model_dump()
 
-@api.post("/api/create_section")
+@app.post("/api/create_section")
 def api_create_section(newSection : Section):
     passcode = create_passcode()
     db[passcode] = newSection
     return {'passcode':passcode}
 
-@api.post("/api/{passcode}/create_student")
+@app.post("/api/{passcode}/create_student")
 def api_create_student(passcode : str, newStudent : Student):
     if passcode in db:
         studentList = db[passcode].studentList
@@ -35,7 +35,7 @@ def api_create_student(passcode : str, newStudent : Student):
         studentList.append(newStudent)
         return {'student_id':student_id}
 
-@api.get("/api/{passcode}/{student_id}/view_schedule")
+@app.get("/api/{passcode}/{student_id}/view_schedule")
 def api_view_schedule(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
         section = db[passcode]
@@ -43,7 +43,7 @@ def api_view_schedule(passcode : str, student_id : int):
         schedule = student.schedule
         return {'schedule':schedule}
 
-@api.post("/api/{passcode}/{student_id}/update_schedule")
+@app.post("/api/{passcode}/{student_id}/update_schedule")
 def api_update_schedule(passcode : str, student_id : int, update : ScheduleUpdate):
     if validate_student(passcode, student_id):
         section = db[passcode]
@@ -54,13 +54,13 @@ def api_update_schedule(passcode : str, student_id : int, update : ScheduleUpdat
     return {'result':'error'}
 
 
-@api.get("/api/{passcode}/verify")
+@app.get("/api/{passcode}/verify")
 def api_verify_passcode(passcode : str):
     if passcode in db:
         return {'result':'success'}
     return {'result':'error'}
     
-@api.get("/api/{passcode}/{student_id}/group_cumulative")
+@app.get("/api/{passcode}/{student_id}/group_cumulative")
 def api_group_cumulative(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
         section = db[passcode]
@@ -120,20 +120,20 @@ def rank_schedules(similarHours):
     
 # ROUTES
 
-@api.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def home(request : Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-@api.get("/create_section", response_class=HTMLResponse)
+@app.get("/create_section", response_class=HTMLResponse)
 def create_section(request : Request):
     return templates.TemplateResponse("create_section.html", {"request": request})
 
-@api.get("/{passcode}/create_student", response_class=HTMLResponse)
+@app.get("/{passcode}/create_student", response_class=HTMLResponse)
 def create_student(request : Request, passcode : str):
     return templates.TemplateResponse("create_student.html", {"request": request, 
                                                               "passcode":passcode})
 
-@api.get("/{passcode}/{student_id}")
+@app.get("/{passcode}/{student_id}")
 def view_section(request : Request, passcode : str, student_id : int):
     displayName = ""
     className = ""
@@ -149,11 +149,11 @@ def view_section(request : Request, passcode : str, student_id : int):
                                                             "className":className,
                                                             "classDescription":classDescription})
 
-@api.get("/{passcode}/{student_id}/view_group")
+@app.get("/{passcode}/{student_id}/view_group")
 def view_group(request : Request, passcode : str, student_id : int):
     return templates.TemplateResponse("view_groupmates.html", {"request": request, 
                                                             "passcode": passcode, 
                                                             "student_id": student_id})
 
 if __name__ == "__main__":
-    uvicorn.run(api)
+    uvicorn.run(app)
