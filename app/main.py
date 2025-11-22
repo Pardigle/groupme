@@ -5,12 +5,18 @@ from fastapi.templating import Jinja2Templates
 from passcodes import create_passcode
 from models import Student, Section, ScheduleUpdate
 import uvicorn
+from pathlib import Path
 
 app = FastAPI()
 
-app.mount("/logo-assets", StaticFiles(directory="templates/logo"), name="static")
+#remove later. and replace directory=str(STATIC_DIR) to  directory="templates/logo"
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR/"templates"/"logo"
 
-templates = Jinja2Templates(directory="templates")
+app.mount("/logo-assets", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+# remove (base_dir/...) later
+templates = Jinja2Templates(directory=str(BASE_DIR/"templates"))
 
 db = {}
 
@@ -68,6 +74,15 @@ def api_group_cumulative(passcode : str, student_id : int):
         similarSchedules = similar_hours_cumultative(student, section)
         sortedSimilarSchedules = rank_schedules(similarSchedules)
         return {"data":sortedSimilarSchedules}
+    
+@app.get("/api/{passcode}/{student_id}/group_consecutive")
+def api_group_consecutive(passcode : str, student_id : int):
+    if validate_student(passcode, student_id):
+        section = db[passcode]
+        student = section.studentList[student_id]
+        similarSchedules = similar_hours_consecutive(student, section)
+        sortedSimilarSchedules = rank_schedules(similarSchedules)
+        return {"data":sortedSimilarSchedules}
 
 def validate_student(passcode : str, student_id : int):
     if passcode in db:
@@ -88,6 +103,33 @@ def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
             similarSched = studentSched.intersection(comparedSched)
             similarHours.append((student.displayName, len(similarSched) * 0.5, student.contactDetails))
     return similarHours
+
+def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
+    allStudentsChunks = []
+    rankingList = currentSection.studentList
+    studentSched = currentStudent.schedule
+    student_id = 0
+    for student in rankingList:
+        if student != currentStudent:
+            comparedSched = student.schedule
+            similarSched = studentSched.intersection(comparedSched)
+            similarSched = sorted(list(similarSched))
+
+            chunkLengths = []
+            currentChunkLength = 0.5
+
+            for slotIndex in range(0, len(similarSched)-1):
+                currentDay, currentStart, currentEnd = similarSched[slotIndex].split("-")
+                nextDay, nextStart, nextEnd = similarSched[slotIndex+1].split("-")
+                if currentDay==nextDay and nextStart==currentEnd:
+                    currentChunkLength += 0.5
+                else:
+                    chunkLengths.append(currentChunkLength)
+                    currentChunkLength=0.5
+            chunkLengths.append(currentChunkLength)
+            maxLength = max(chunkLengths)
+            allStudentsChunks.append((student.displayName, maxLength, student.contactDetails))
+    return allStudentsChunks
 
 def merge(L1, L2):
     mergedList = []
