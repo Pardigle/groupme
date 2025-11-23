@@ -196,15 +196,14 @@ def merge(L1, L2):
         L1.pop(0)
     return mergedList
 
-def merge_sort(L1):
+def merge_sort(L):
     """Merge sort implementation."""
-    if len(L1) <= 1:
-        return L1
+    if len(L) <= 1:
+        return L
     else:
-        copy_L1 = L1.copy()
-        middleIndex = len(copy_L1) // 2
-        firstHalf = copy_L1[:middleIndex]
-        secondHalf = copy_L1[middleIndex:]
+        middleIndex = len(L) // 2
+        firstHalf = L[:middleIndex]
+        secondHalf = L[middleIndex:]
         firstHalf = merge_sort(firstHalf)
         secondHalf = merge_sort(secondHalf)
         return merge(firstHalf, secondHalf)
