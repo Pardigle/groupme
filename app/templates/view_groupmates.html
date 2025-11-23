@@ -45,7 +45,14 @@
                             groupmatesTable.appendChild(groupmateTr);
                             rank++;
 
-                            groupmateTr.style.cursor = 'pointer';
+                            groupmateTr.style.cursor = "pointer";
+                            groupmateTr.style.backgroundColor = "white";
+                            groupmateTr.addEventListener('mouseover', function(){
+                                this.style.backgroundColor = "rgb(228,228,228)";
+                            });
+                            groupmateTr.addEventListener('mouseout', function(){
+                                this.style.backgroundColor = "white";
+                            });
                             groupmateTr.addEventListener('click', function(){
                                 
                                 let cells = document.querySelectorAll("#time-table .time-cell");

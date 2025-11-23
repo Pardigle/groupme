@@ -166,7 +166,7 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
         if student != currentStudent:
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
-            similarSched = sorted(list(similarSched))
+            similarSched = merge_sort(list(similarSched))
             maxLength = 0
             if similarSched:
                 currentChunkLength = 0.5
@@ -202,18 +202,23 @@ def merge(L1, L2):
         L1.pop(0)
     return mergedList
 
+def merge_sort(L1):
+    if len(L1) <= 1:
+        return L1
+    else:
+        copy_L1 = L1.copy()
+        middleIndex = len(copy_L1) // 2
+        firstHalf = copy_L1[:middleIndex]
+        secondHalf = copy_L1[middleIndex:]
+        firstHalf = merge_sort(firstHalf)
+        secondHalf = merge_sort(secondHalf)
+        return merge(firstHalf, secondHalf)
+
+
 def rank_schedules(similarHours):
     """Mergesort implementation."""
-    if len(similarHours) <= 1:
-        return similarHours
-    else:
-        hoursList = similarHours.copy()
-        middleIndex = len(hoursList) // 2
-        firstHalf = hoursList[:middleIndex]
-        secondHalf = hoursList[middleIndex:]
-        firstHalf = rank_schedules(firstHalf)
-        secondHalf = rank_schedules(secondHalf)
-        return merge(firstHalf, secondHalf)
+    return merge_sort(similarHours)
+    
     
 # ROUTES
 
