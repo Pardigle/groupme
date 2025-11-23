@@ -115,7 +115,8 @@ def api_check_schedule_intersection(passcode : str, student_id : int, classmate_
         return {"intersections":intersections, 
                 "studentADiff":studentADiff, 
                 "studentBDiff":studentBDiff}
-    
+
+# Helper Functions
 
 def validate_student(passcode : str, student_id : int):
     """Verify student-section pair."""
@@ -123,8 +124,6 @@ def validate_student(passcode : str, student_id : int):
         if student_id in range(len(db[passcode].studentList)):
             return True
     return False
-
-# ALGORITHMS
 
 def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
     """Retrieve total similar schedule between a student and their classmates.
