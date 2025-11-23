@@ -106,6 +106,19 @@ def api_group_consecutive(passcode : str, student_id : int):
         similarSchedules = similar_hours_consecutive(student, section)
         sortedSimilarSchedules = rank_schedules(similarSchedules)
         return {"data":sortedSimilarSchedules}
+    
+@app.get("/api/{passcode}/{student_id}/schedule_intersect/{classmate_id}")
+def api_check_schedule_intersection(passcode : str, student_id : int, classmate_id : int):
+    if validate_student(passcode, student_id) and validate_student(passcode, classmate_id):
+        section = db[passcode]
+        studentA = section.studentList[student_id]
+        studentB = section.studentList[classmate_id]
+        studentASched = studentA.schedule
+        studentBSched = studentB.schedule
+        intersections = studentASched.intersection(studentBSched)
+        differences = studentASched.symmetric_difference(studentBSched)
+        return {"intersections":intersections, "differences":differences}
+    
 
 def validate_student(passcode : str, student_id : int):
     """Verify student-section pair."""
