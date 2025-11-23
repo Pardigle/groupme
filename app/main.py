@@ -166,7 +166,7 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
         if student != currentStudent:
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
-            similarSched = merge_sort(list(similarSched))
+            similarSched = sorted(list(similarSched))
             maxLength = 0
             if similarSched:
                 currentChunkLength = 0.5
