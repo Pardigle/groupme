@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.exceptions import HTTPException
+from fastapi.exceptions import HTTPException, RequestValidationError
 from passcodes import create_passcode
 from models import Student, Section, ScheduleUpdate
 import uvicorn
@@ -17,12 +17,6 @@ app.mount("/logo-assets", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(BASE_DIR/"templates"))
 
 db = {}
-
-@app.get("/api/{passcode}")
-def api_view_section(passcode : str):
-    """Retrieve all attributes of a section."""
-    if passcode in db:
-        return db[passcode].model_dump()
 
 @app.post("/api/create_section")
 def api_create_section(newSection : Section):
@@ -90,7 +84,7 @@ def api_group_cumulative(passcode : str, student_id : int):
         section = db[passcode]
         student = section.studentList[student_id]
         similarSchedules = similar_hours_cumultative(student, section)
-        sortedSimilarSchedules = rank_schedules(similarSchedules)
+        sortedSimilarSchedules = merge_sort(similarSchedules)
         return {"data":sortedSimilarSchedules}
     
 @app.get("/api/{passcode}/{student_id}/group_consecutive")
@@ -104,7 +98,7 @@ def api_group_consecutive(passcode : str, student_id : int):
         section = db[passcode]
         student = section.studentList[student_id]
         similarSchedules = similar_hours_consecutive(student, section)
-        sortedSimilarSchedules = rank_schedules(similarSchedules)
+        sortedSimilarSchedules = merge_sort(similarSchedules)
         return {"data":sortedSimilarSchedules}
     
 @app.get("/api/{passcode}/{student_id}/schedule_intersect/{classmate_id}")
@@ -203,6 +197,7 @@ def merge(L1, L2):
     return mergedList
 
 def merge_sort(L1):
+    """Merge sort implementation."""
     if len(L1) <= 1:
         return L1
     else:
@@ -213,12 +208,6 @@ def merge_sort(L1):
         firstHalf = merge_sort(firstHalf)
         secondHalf = merge_sort(secondHalf)
         return merge(firstHalf, secondHalf)
-
-
-def rank_schedules(similarHours):
-    """Mergesort implementation."""
-    return merge_sort(similarHours)
-    
     
 # ROUTES
 
@@ -271,8 +260,13 @@ def view_group(request : Request, passcode : str, student_id : int):
     return templates.TemplateResponse("error_page.html", {"request":request})
 
 @app.exception_handler(404)
-def catch_errors(request : Request, exc: HTTPException):
+def catch_404_errors(request : Request, exc: HTTPException):
     """Catch all for non-existent pages."""
+    return RedirectResponse("/")
+
+@app.exception_handler(RequestValidationError)
+def catch_errors(request : Request, exc: RequestValidationError):
+    """Catch all for unprocessable pages."""
     return RedirectResponse("/")
 
 if __name__ == "__main__":
