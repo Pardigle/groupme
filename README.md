@@ -1,6 +1,6 @@
 # GroupMe
-Ever been a lonely soul in elective classes? Needing to find a group but not knowing other people? 
-Use GroupMe to find your groupmates easy-peasy!
+Ever been a lonely soul in elective classes? Need to find a group but don't know any other person? 
+Use GroupMe to find your groupmates easy-peasy! No more hassle to individually DM your classmates!
 
 ## What you can do?
 1. Creating shareable class codes.
