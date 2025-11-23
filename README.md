@@ -13,14 +13,16 @@ Use GroupMe to find your groupmates easy-peasy! No more hassle to individually D
 - Backend API - FastAPI
 
 ## File Structure
+```bash
 ├── app
-│   ├── templates      <- HTML and svg files.
-│   ├── main.py        <- FastAPI functions, algorithms, routes.
-│   ├── models.py      <- Pydantic models. 
-│   ├── passcodes.py   <- Function for obtaining passcodes.
-│   ├── tests.py       <- Unit tests for API functions. 
+│   ├── templates      <- HTML and svg files.
+│   ├── main.py        <- FastAPI functions, algorithms, routes.
+│   ├── models.py      <- Pydantic models.
+│   ├── passcodes.py   <- Function for obtaining passcodes.
+│   ├── tests.py       <- Unit tests for API functions.
 ├── README.md
-└── requirements.txt   <- Required versions, libraries for project.
+└── requirements.txt   <- Required versions, libraries for project.
+```
 
 ## Instructions for Users
 
