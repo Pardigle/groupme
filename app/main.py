@@ -116,8 +116,11 @@ def api_check_schedule_intersection(passcode : str, student_id : int, classmate_
         studentASched = studentA.schedule
         studentBSched = studentB.schedule
         intersections = studentASched.intersection(studentBSched)
-        differences = studentASched.symmetric_difference(studentBSched)
-        return {"intersections":intersections, "differences":differences}
+        studentADiff = studentASched.difference(studentBSched)
+        studentBDiff = studentBSched.difference(studentASched)
+        return {"intersections":intersections, 
+                "studentADiff":studentADiff, 
+                "studentBDiff":studentBDiff}
     
 
 def validate_student(passcode : str, student_id : int):
@@ -138,11 +141,14 @@ def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
     similarHours = []
     rankingList = currentSection.studentList
     studentSched = currentStudent.schedule
+    student_id = 0
     for student in rankingList:
         if student != currentStudent:
             comparedSched = student.schedule
             similarSched = studentSched.intersection(comparedSched)
-            similarHours.append((student.displayName, len(similarSched) * 0.5, student.contactDetails))
+            similarHours.append((student.displayName, len(similarSched) * 0.5,
+                                student.contactDetails, student_id))
+        student_id += 1
     return similarHours
 
 def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
@@ -155,6 +161,7 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
     allStudentsChunks = []
     rankingList = currentSection.studentList
     studentSched = currentStudent.schedule
+    student_id = 0
     for student in rankingList:
         if student != currentStudent:
             comparedSched = student.schedule
@@ -173,7 +180,9 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
                             maxLength = currentChunkLength
                         currentChunkLength = 0.5
                 maxLength = max(currentChunkLength, maxLength)
-            allStudentsChunks.append((student.displayName, maxLength, student.contactDetails))
+            allStudentsChunks.append((student.displayName, maxLength,
+                                      student.contactDetails, student_id))
+        student_id += 1
     return allStudentsChunks
 
 def merge(L1, L2):

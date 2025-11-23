@@ -30,28 +30,56 @@
                             var groupmateName = document.createElement('td');
                             var groupmateHours = document.createElement('td');
                             var groupmateContact = document.createElement('td');
+                            var groupmateID = document.createElement('td');
+                            groupmateID.hidden = true;
                             groupmateRank.appendChild(document.createTextNode(rank));
                             groupmateName.appendChild(document.createTextNode(item[0]));
                             groupmateHours.appendChild(document.createTextNode(item[1]));
                             groupmateContact.appendChild(document.createTextNode(item[2]));
+                            groupmateID.appendChild(document.createTextNode(item[3]))
                             groupmateTr.appendChild(groupmateRank);
                             groupmateTr.appendChild(groupmateName);
                             groupmateTr.appendChild(groupmateHours);
                             groupmateTr.appendChild(groupmateContact);
+                            groupmateTr.appendChild(groupmateID);
                             groupmatesTable.appendChild(groupmateTr);
                             rank++;
 
-                            groupmateTr.style.cursor = 'pointer'; // indicate that its clickable
+                            groupmateTr.style.cursor = 'pointer';
                             groupmateTr.addEventListener('click', function(){
                                 
                                 let cells = document.querySelectorAll("#time-table .time-cell");
                                 var popupBlock = document.getElementById("popup")
                                 var nameText = document.getElementById("name-popup");
                                 var contactText = document.getElementById("contact-popup");
+                                var classmateID = item[3]
                                 nameText.innerText = item[0];
                                 contactText.innerText = item[2];
 
-                                
+                                fetch(`/api/{{ passcode }}/{{ student_id }}/schedule_intersect/${classmateID}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    studentADiff = data["studentADiff"];
+                                    studentBDiff = data["studentBDiff"];
+                                    intersections = data["intersections"];
+                                    
+                                    cells.forEach(function(cell) {
+                                        cell.classList.remove("overlap", "my_nonoverlap", "groupmate_nonoverlap");
+                                        const timeSlot = cell.getAttribute('day') + cell.getAttribute('time')
+                                        if (intersections.includes(timeSlot)) {
+                                            cell.classList.add("overlap");
+                                        } else if (studentADiff.includes(timeSlot)) {
+                                            cell.classList.add("my_nonoverlap");
+                                        } else if (studentBDiff.includes(timeSlot)) {
+                                            cell.classList.add("groupmate_nonoverlap");
+                                        }
+                                    })
+
+                                })
+                                .catch(error => {
+                                    console.error("Error fetching student schedules", error);
+                                });
+
                                 popupBlock.style.display = 'block';
 
                                 var closeButton = document.getElementById("close-popup");
@@ -67,15 +95,16 @@
                 }
             });
         </script>
-                <style>
+        <!-- https://www.w3schools.com/howto/howto_css_disable_text_selection.asp -->
+        <style>
             .time-table {
-                font-size: 12px;
+                font-size: 10px;
                 display: flex;
                 justify-content: center;
             }
 
             .time-table td {
-                height: 12px;
+                height: 15px;
             }
 
             .time-cell {
@@ -89,17 +118,33 @@
 
             .time-label, .days_header {
                 background-color: white;
+                white-space: nowrap;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
             }
             
             .time-table td.my_nonoverlap {
-                background-color: lightblue;
+                background-color: rgb(255, 255, 215);
             }
 
             .time-table td.groupmate_nonoverlap {
-                background-color: palegoldenrod;
+                background-color: rgb(215, 255, 240);
             }
 
             .time-table td.overlap {
+                background-color: springgreen;
+            }
+
+            .legend-my_nonoverlap {
+                background-color: rgb(255, 255, 215);
+            }
+
+            .legend-groupmate_nonoverlap {
+                background-color: rgb(215, 255, 240);
+            }
+
+            .legend-overlap {
                 background-color: springgreen;
             }
 
@@ -151,6 +196,7 @@
                             <th scope="col"> Name </td>
                             <th scope="col" id="th-time"> Similar Hours </td>
                             <th scope="col"> Contact Details </td>
+                            <th id="student_id" hidden></th>
                         </tr>
                     </table>
                 </div>
@@ -171,8 +217,27 @@
             <p>Groupmate Details</p>
             <h3 id="name-popup"></h3>
             <p id="contact-popup"></p>
-            <button class="btn btn-danger" id="close-popup">x</button>
-            <table class="time-table">
+            <button id="close-popup" style="background: none; border: none; margin-right: 2%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                </svg>
+            </button>
+            <div class="d-flex flex-wrap justify-content-center p-3 bg-white rounded-3 w-100 mx-auto" style="max-width: 500px;">
+                <div class="d-flex align-items-center me-4">
+                    <span class="legend-overlap mx-1" style="width: 50px; height: 10px; display: inline-block; border: 1px solid #dee2e6;"></span>
+                    <span style="font-size: 12px;">Overlap</span>
+                </div>
+                <div class="d-flex align-items-center me-4">
+                    <span class="legend-my_nonoverlap mx-1" style="width: 50px; height: 10px; display: inline-block; border: 1px solid #dee2e6;"></span>
+                    <span style="font-size: 12px;">Your Schedule</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="legend-groupmate_nonoverlap mx-1" style="width: 50px; height: 10px; display: inline-block; border: 1px solid #dee2e6;"></span>
+                    <span style="font-size: 12px;">Their Schedule</span>
+                </div>
+            </div>
+
+            <table class="time-table" id="time-table">
                 <tr class="text-center">
                     <td class="days-header"></td>
                     <td class="days-header">Mon</td>
