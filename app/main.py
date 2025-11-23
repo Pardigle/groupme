@@ -198,11 +198,11 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
             currentLength = 0
             maxLength = 0
             for slot in ALLPOSSIBLETIMES:
-                if slot in studentSched and slot in comparedSched:
-                    currentLength += 0.5
-                elif slot == "":
+                if slot == "":
                     maxLength = max(maxLength,currentLength)
                     currentLength =0
+                elif slot in studentSched and slot in comparedSched:
+                    currentLength += 0.5
                 else:
                     maxLength = max(maxLength,currentLength)
                     currentLength =0
