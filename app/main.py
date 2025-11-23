@@ -21,11 +21,10 @@ db = {}
 @app.post("/api/create_section")
 def api_create_section(newSection : Section):
     """Create a section and match it with a passcode."""
-    while True:
-        passcode = create_passcode()
-        if passcode not in db:
-            db[passcode] = newSection
-            return {'passcode':passcode}
+    passcode = create_passcode()
+    if passcode not in db:
+        db[passcode] = newSection
+        return {'passcode':passcode}
 
 @app.post("/api/{passcode}/create_student")
 def api_create_student(passcode : str, newStudent : Student):
