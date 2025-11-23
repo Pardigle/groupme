@@ -159,16 +159,29 @@
                 padding: 2rem;
                 display: none;
                 overflow-y: scroll;
+                scrollbar-color: white rgba(254, 254, 254);
             }
 
             #close-popup {
-                margin-top: 30px;
-                margin-top: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                margin-top: 17px;
                 top: 5px;
                 right: 5px;
                 cursor: pointer;
                 position: absolute;
+                align-items: center;
+                background-color: white;
+                border-radius: 50%;
             }
+
+            #close-popup:hover{
+                background-color: rgb(228,228,228);
+            }
+
         </style>
 
 {% endblock %}
@@ -217,7 +230,7 @@
             <p>Groupmate Details</p>
             <h3 id="name-popup"></h3>
             <p id="contact-popup"></p>
-            <button id="close-popup" style="background: none; border: none; margin-right: 2%;">
+            <button id="close-popup" style="border: none; margin-right: 2%;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
                     <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                 </svg>
