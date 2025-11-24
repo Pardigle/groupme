@@ -83,7 +83,7 @@ def api_group_cumulative(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
         section = db[passcode]
         student = section.studentList[student_id]
-        similarSchedules = similar_hours_cumultative(student, section)
+        similarSchedules = similar_hours_cumulative(student, section)
         sortedSimilarSchedules = merge_sort(similarSchedules)
         return {"data":sortedSimilarSchedules}
     
@@ -126,7 +126,7 @@ def validate_student(passcode : str, student_id : int):
             return True
     return False
 
-def similar_hours_cumultative(currentStudent: Student, currentSection: Section):
+def similar_hours_cumulative(currentStudent: Student, currentSection: Section):
     """Retrieve total similar schedule between a student and their classmates.
 
     Returns a list 'similarHours' of tuples containing: 
