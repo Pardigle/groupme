@@ -109,12 +109,13 @@ def api_check_schedule_intersection(passcode : str, student_id : int, classmate_
         studentB = section.studentList[classmate_id]
         studentASched = studentA.schedule
         studentBSched = studentB.schedule
-        intersections = studentASched.intersection(studentBSched)
-        studentADiff = studentASched.difference(studentBSched)
-        studentBDiff = studentBSched.difference(studentASched)
-        return {"intersections":intersections, 
-                "studentADiff":studentADiff, 
-                "studentBDiff":studentBDiff}
+        if studentASched and studentBSched:
+            intersections = studentASched.intersection(studentBSched)
+            studentADiff = studentASched.difference(studentBSched)
+            studentBDiff = studentBSched.difference(studentASched)
+            return {"intersections":intersections, 
+                    "studentADiff":studentADiff, 
+                    "studentBDiff":studentBDiff}
 
 # Helper Functions
 
