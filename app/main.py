@@ -130,7 +130,7 @@ def similar_hours_cumulative(currentStudent: Student, currentSection: Section):
     """Retrieve total similar schedule between a student and their classmates.
 
     Returns a list 'similarHours' of tuples containing: 
-    (classmateDisplayName, classmateSimilarHours, classmateContactDetails)
+    (classmateDisplayName, classmateSimilarHours, classmateContactDetails, student_id)
     """
     similarHours = []
     rankingList = currentSection.studentList
@@ -150,7 +150,7 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
     their classmates.
 
     Returns a list 'similarHours' of tuples containing: 
-    (classmateDisplayName, classmateConsecutiveHours, classmateContactDetails)
+    (classmateDisplayName, classmateConsecutiveHours, classmateContactDetails, student_id)
     """
     allStudentsChunks = []
     rankingList = currentSection.studentList
