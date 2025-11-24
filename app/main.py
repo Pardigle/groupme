@@ -62,7 +62,8 @@ def api_get_studentlist(passcode : str, student_id : int):
     """Retrieve all display names of classmates of the specified student."""
     if passcode in db:
         section = db[passcode]
-        studentList = [i.displayName for i in section.studentList[:student_id:]]
+        studentList = [i.displayName for stud_id, i in enumerate(section.studentList)
+                       if stud_id != student_id]
         return {'studentList': studentList}
 
 @app.get("/api/{passcode}/verify")
