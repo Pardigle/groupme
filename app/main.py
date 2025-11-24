@@ -70,8 +70,8 @@ def api_get_studentlist(passcode : str, student_id : int):
 def api_verify_passcode(passcode : str):
     """Verify if passcode exists in the database."""
     if passcode in db:
-        return {'result':'success'}
-    return {'result':'error'}
+        return {'result':True}
+    return {'result':False}
     
 @app.get("/api/{passcode}/{student_id}/group_cumulative")
 def api_group_cumulative(passcode : str, student_id : int):

@@ -4,6 +4,130 @@ from models import Student, Section, ScheduleUpdate
 
 db = {}
 
+class GroupMeUnitTests(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.passcode = "ABC123"
+        self.section = Section(sectionName="Krusty Krabs", maxSize=4)
+
+        self.studentA = Student(displayName="Mr. Krabs",
+                                contactDetails="Meet me at Krusty Krabs.",
+                                schedule={
+                                    "0-0800-0830", "0-0830-0900", "0-0900-0930"
+                                })
+        self.studentB = Student(displayName="Spongebob",
+                                contactDetails="Hello, I am Spongebob.",
+                                schedule={
+                                    "0-0800-0830", "0-0830-0900", "0-0900-0930"
+                                })
+        self.studentC = Student(displayName="Squidward",
+                                contactDetails="Go away.",
+                                schedule={
+                                    "0-0800-0830", "0-0900-0930", "0-1000-1030"
+                                })
+        self.studentD = Student(displayName="Patrick Star",
+                                contactDetails="I'm in my rock.",
+                                schedule={
+                                    "0-0800-0830", "0-0900-0930", "0-1000-1030"
+                                })
+
+        db[self.passcode] = self.section
+        self.section.studentList.append(self.studentA)
+        self.section.studentList.append(self.studentB)
+        self.section.studentList.append(self.studentC)
+        self.section.studentList.append(self.studentD)
+
+    def test_validate_student_success(self):
+        self.assertTrue(validate_student(self.passcode, 0))
+        self.assertTrue(validate_student(self.passcode, 2))
+    
+    def test_validate_student_fail_passcode(self):
+        self.assertFalse(validate_student("CHUM12", 0))
+        self.assertFalse(validate_student("GORP36", 2))
+    
+    def test_validate_student_fail_student_id(self):
+        self.assertFalse(validate_student(self.passcode, 4)) 
+        self.assertFalse(validate_student(self.passcode, -3))
+    
+    def test_merge_sort(self):
+        data = [("D", 0.5), ("C", 1.5), ("B", 3), ("A", 4.5)]
+        expected_sort = [("A", 4.5), ("B", 3), ("C", 1.5), ("D", 0.5)]
+        self.assertEqual(merge_sort(data), expected_sort)
+        self.assertEqual(merge_sort([]), [])
+    
+    def test_similar_hours_cumulative(self):
+        result = similar_hours_cumultative(self.studentA, self.section)
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0][1], 1.5) 
+        self.assertEqual(result[1][1], 1.0)
+        self.assertEqual(result[2][1], 1.0)
+
+    def test_similar_hours_consecutive(self):
+        result = similar_hours_consecutive(self.studentA, self.section)
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0][1], 1.5)
+        self.assertEqual(result[1][1], 0.5)
+        self.assertEqual(result[2][1], 0.5)
+
+    def test_api_create_student_success(self):
+        self.section.studentList.pop() 
+        new_student = self.studentD
+        response = api_create_student(self.passcode, new_student)
+        self.assertEqual(response, {'student_id': 3})
+        self.assertEqual(len(db[self.passcode].studentList), 4) 
+    
+    def test_api_create_student_fail_max_size(self):
+        new_student = Student(displayName="Sandy Cheeks",
+                            contactDetails="Yeehaw!",
+                            schedule={"0-0800-0830"})
+        response = api_create_student(self.passcode, new_student)
+        self.assertIsNone(response)
+        self.assertEqual(len(db[self.passcode].studentList), 4)
+
+    def test_api_view_schedule_success(self):
+        response = api_view_schedule(self.passcode, 0)
+        self.assertEqual(response['schedule'], {"0-0800-0830", "0-0830-0900", "0-0900-0930"})
+    
+    def test_api_view_schedule_fail_student_id(self):
+        response = api_view_schedule(self.passcode, 99)
+        self.assertIsNone(response)
+    
+    def test_api_update_schedule_success(self):
+        new_schedule = ["0-0800-0830", "0-0930-1000", "0-1030-1100"]
+        update_data = ScheduleUpdate(schedule=new_schedule)
+        response = api_update_schedule(self.passcode, 1, update_data)
+        self.assertEqual(response, {'result': 'success'}) 
+        self.assertEqual(db[self.passcode].studentList[1].schedule, set(new_schedule))
+
+    def test_api_get_studentList_success(self):
+        response = api_get_studentlist(self.passcode, 1)
+        self.assertEqual(response['studentList'], ['Mr. Krabs'])
+
+    def test_api_verify_passcode(self):
+        self.assertEqual(api_verify_passcode(self.passcode), {'result': True})
+        self.assertEqual(api_verify_passcode("GLORBS"), {'result': False})
+    
+    def test_api_group_cumulative_ranking(self):
+        response = api_group_cumulative(self.passcode, 0)
+        
+        expected_result = [
+            ('Spongebob', 1.5, 'Hello, I am Spongebob.', 1),
+            ('Patrick Star', 1.0, "I'm in my rock.", 3),
+            ('Squidward', 1.0, 'Go away.', 2)
+        ]
+        self.assertEqual(response['data'], expected_result)
+
+    def test_api_group_consecutive_ranking(self):
+        response = api_group_consecutive(self.passcode, 0)
+        
+        expected_result = [
+            ('Spongebob', 1.5, 'Hello, I am Spongebob.', 1),
+            ('Patrick Star', 0.5, "I'm in my rock.", 3),
+            ('Squidward', 0.5, 'Go away.', 2)
+        ]
+        self.assertEqual(response['data'], expected_result)
+
 #Copy-pasted relevant functions to test, which use global variable db.
 
 ALLPOSSIBLETIMES = [
@@ -158,8 +282,8 @@ def api_get_studentlist(passcode : str, student_id : int):
 
 def api_verify_passcode(passcode : str):
     if passcode in db:
-        return {'result':'success'}
-    return {'result':'error'}
+        return {'result':True}
+    return {'result':False}
 
 def api_group_cumulative(passcode : str, student_id : int):
     if validate_student(passcode, student_id):
@@ -176,130 +300,6 @@ def api_group_consecutive(passcode : str, student_id : int):
         similarSchedules = similar_hours_consecutive(student, section)
         sortedSimilarSchedules = merge_sort(similarSchedules)
         return {"data":sortedSimilarSchedules}
-
-class GroupMeUnitTests(unittest.TestCase):
-
-    def setUp(self):
-        
-        self.passcode = "ABC123"
-        self.section = Section(sectionName="Krusty Krabs", maxSize=4)
-
-        self.studentA = Student(displayName="Mr. Krabs",
-                                contactDetails="Meet me at Krusty Krabs.",
-                                schedule={
-                                    "0-0800-0830", "0-0830-0900", "0-0900-0930"
-                                })
-        self.studentB = Student(displayName="Spongebob",
-                                contactDetails="Hello, I am Spongebob.",
-                                schedule={
-                                    "0-0800-0830", "0-0830-0900", "0-0900-0930"
-                                })
-        self.studentC = Student(displayName="Squidward",
-                                contactDetails="Go away.",
-                                schedule={
-                                    "0-0800-0830", "0-0900-0930", "0-1000-1030"
-                                })
-        self.studentD = Student(displayName="Patrick Star",
-                                contactDetails="I'm in my rock.",
-                                schedule={
-                                    "0-0800-0830", "0-0900-0930", "0-1000-1030"
-                                })
-
-        db[self.passcode] = self.section
-        self.section.studentList.append(self.studentA)
-        self.section.studentList.append(self.studentB)
-        self.section.studentList.append(self.studentC)
-        self.section.studentList.append(self.studentD)
-
-    def test_validate_student_success(self):
-        self.assertTrue(validate_student(self.passcode, 0))
-        self.assertTrue(validate_student(self.passcode, 2))
-    
-    def test_validate_student_fail_passcode(self):
-        self.assertFalse(validate_student("CHUM12", 0))
-        self.assertFalse(validate_student("GORP36", 2))
-    
-    def test_validate_student_fail_student_id(self):
-        self.assertFalse(validate_student(self.passcode, 4)) 
-        self.assertFalse(validate_student(self.passcode, -3))
-    
-    def test_merge_sort(self):
-        data = [("D", 0.5), ("C", 1.5), ("B", 3), ("A", 4.5)]
-        expected_sort = [("A", 4.5), ("B", 3), ("C", 1.5), ("D", 0.5)]
-        self.assertEqual(merge_sort(data), expected_sort)
-        self.assertEqual(merge_sort([]), [])
-    
-    def test_similar_hours_cumulative(self):
-        result = similar_hours_cumultative(self.studentA, self.section)
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0][1], 1.5) 
-        self.assertEqual(result[1][1], 1.0)
-        self.assertEqual(result[2][1], 1.0)
-
-    def test_similar_hours_consecutive(self):
-        result = similar_hours_consecutive(self.studentA, self.section)
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0][1], 1.5)
-        self.assertEqual(result[1][1], 0.5)
-        self.assertEqual(result[2][1], 0.5)
-
-    def test_api_create_student_success(self):
-        self.section.studentList.pop() 
-        new_student = self.studentD
-        response = api_create_student(self.passcode, new_student)
-        self.assertEqual(response, {'student_id': 3})
-        self.assertEqual(len(db[self.passcode].studentList), 4) 
-    
-    def test_api_create_student_fail_max_size(self):
-        new_student = Student(displayName="Sandy Cheeks",
-                            contactDetails="Yeehaw!",
-                            schedule={"0-0800-0830"})
-        response = api_create_student(self.passcode, new_student)
-        self.assertIsNone(response)
-        self.assertEqual(len(db[self.passcode].studentList), 4)
-
-    def test_api_view_schedule_success(self):
-        response = api_view_schedule(self.passcode, 0)
-        self.assertEqual(response['schedule'], {"0-0800-0830", "0-0830-0900", "0-0900-0930"})
-    
-    def test_api_view_schedule_fail_student_id(self):
-        response = api_view_schedule(self.passcode, 99)
-        self.assertIsNone(response)
-    
-    def test_api_update_schedule_success(self):
-        new_schedule = ["0-0800-0830", "0-0930-1000", "0-1030-1100"]
-        update_data = ScheduleUpdate(schedule=new_schedule)
-        response = api_update_schedule(self.passcode, 1, update_data)
-        self.assertEqual(response, {'result': 'success'}) 
-        self.assertEqual(db[self.passcode].studentList[1].schedule, set(new_schedule))
-
-    def test_api_get_studentList_success(self):
-        response = api_get_studentlist(self.passcode, 1)
-        self.assertEqual(response['studentList'], ['Mr. Krabs'])
-
-    def test_api_verify_passcode(self):
-        self.assertEqual(api_verify_passcode(self.passcode), {'result': 'success'})
-        self.assertEqual(api_verify_passcode("GLORBS"), {'result': 'error'})
-    
-    def test_api_group_cumulative_ranking(self):
-        response = api_group_cumulative(self.passcode, 0)
-        
-        expected_result = [
-            ('Spongebob', 1.5, 'Hello, I am Spongebob.', 1),
-            ('Patrick Star', 1.0, "I'm in my rock.", 3),
-            ('Squidward', 1.0, 'Go away.', 2)
-        ]
-        self.assertEqual(response['data'], expected_result)
-
-    def test_api_group_consecutive_ranking(self):
-        response = api_group_consecutive(self.passcode, 0)
-        
-        expected_result = [
-            ('Spongebob', 1.5, 'Hello, I am Spongebob.', 1),
-            ('Patrick Star', 0.5, "I'm in my rock.", 3),
-            ('Squidward', 0.5, 'Go away.', 2)
-        ]
-        self.assertEqual(response['data'], expected_result)
 
 if __name__ == "__main__":
     unittest.main()
