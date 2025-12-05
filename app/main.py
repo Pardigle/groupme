@@ -10,7 +10,6 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import HTTPException, RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, Session
@@ -94,25 +93,62 @@ class CreateSection(BaseModel):
 
 app = FastAPI()
 
-# Add CORS middleware for Vercel deployment
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / "templates" / "logo"
+TEMPLATES_DIR = BASE_DIR / "templates"
 
-BASE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = BASE_DIR/"templates"/"logo"
+# Mount static directory only if it exists
+try:
+    if STATIC_DIR.exists():
+        app.mount("/logo-assets", StaticFiles(directory=str(STATIC_DIR)), name="static")
+except Exception:
+    pass
 
-app.mount("/logo-assets", StaticFiles(directory=str(STATIC_DIR)), name="static")
-templates = Jinja2Templates(directory=str(BASE_DIR/"templates"))
+# Initialize templates only if directory exists
+try:
+    if TEMPLATES_DIR.exists():
+        templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+    else:
+        templates = None
+except Exception:
+    templates = None
 
-# DATABASE SETUP
+# DATABASE SETUP (Render)
 
-DATABASE_PATH = BASE_DIR / "groupme.sqlite"
-DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+def _get_database_url(base_dir: Path) -> str:
+    """
+    Return a sqlite URL for Render deployment.
+    Prefer /var/data (Render persistent disk), fall back to project dir.
+    """
+    # Check for explicit env override
+    env_path = os.environ.get("GROUPME_DB_PATH")
+    if env_path:
+        p = Path(env_path)
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            return f"sqlite:///{p}"
+        except Exception:
+            pass
+    
+    # Render: use /var/data for persistent storage (persistent disk mount)
+    data_dir = Path("/var/data")
+    if data_dir.exists() and os.access(data_dir, os.W_OK):
+        p = data_dir / "groupme.sqlite"
+        return f"sqlite:///{p}"
+    
+    # Fallback: use project directory
+    try:
+        db_dir = base_dir / ".data"
+        db_dir.mkdir(parents=True, exist_ok=True)
+        p = db_dir / "groupme.sqlite"
+        return f"sqlite:///{p}"
+    except Exception:
+        pass
+    
+    # Last resort: in-memory (data lost on restart)
+    return "sqlite:///:memory:"
+
+DATABASE_URL = _get_database_url(BASE_DIR)
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
@@ -151,7 +187,12 @@ class StudentORM(Base):
             value = list(value)
         self.schedule_json = json.dumps(list(value))
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception:
+    pass
+
+# HELPER FUNCTIONS
 
 def create_passcode():
     chars = [secrets.choice(ALLOWED_TYPES) 
@@ -177,11 +218,9 @@ def get_students_for_section(sorm: SectionORM, db_session: Session) -> List[Stud
     return db_session.query(StudentORM).filter_by(section_id=sorm.id).order_by(StudentORM.id).all()
 
 def validate_student_in_section(section: Section, student_id: int) -> bool:
-    """Verify if student_id is a valid index in a pydantic Section object."""
     return 0 <= student_id < len(section.studentList)
 
 def validate_student_and_get_section(passcode: str, student_id: int) -> Optional[Section]:
-    """Verify student-section pair and return a pydantic Section if valid."""
     with SessionLocal() as session:
         sorm = get_section_orm(passcode, session)
         if sorm is None:
@@ -217,28 +256,23 @@ def similar_hours_consecutive(currentStudent: Student, currentSection: Section):
             maxLength = 0
             for slot in ALLPOSSIBLETIMES:
                 if slot == "":
-                    maxLength = max(maxLength,currentLength)
+                    maxLength = max(maxLength, currentLength)
                     currentLength = 0
                 elif slot in studentSched and slot in comparedSched:
                     currentLength += 0.5
                 else:
-                    maxLength = max(maxLength,currentLength)
+                    maxLength = max(maxLength, currentLength)
                     currentLength = 0
-                maxLength = max(maxLength,currentLength)
+                maxLength = max(maxLength, currentLength)
             allStudentsChunks.append((student.displayName, maxLength,
                                       student.contactDetails, student_id))
         student_id += 1
     return allStudentsChunks
 
 def merge(L1_list: List, L2_list: List):
-    """
-    Merges two lists (used by merge_sort). 
-    FIX: Uses deque for O(1) pops, ensuring O(N) merge complexity.
-    """
     mergedList = []
     L1 = deque(L1_list)
     L2 = deque(L2_list)
-    
     while L1 and L2:
         if L1[0][1] > L2[0][1]:
             mergedList.append(L1.popleft())
@@ -246,24 +280,18 @@ def merge(L1_list: List, L2_list: List):
             mergedList.append(L2.popleft())
     mergedList.extend(L1)
     mergedList.extend(L2)
-
     return mergedList
 
 def merge_sort(L):
-    """
-    Merge sort implementation.
-    FIX: Relies on the fixed 'merge' function for O(n log n) complexity.
-    """
     if len(L) <= 1:
         return L
-    else:
-        middleIndex = len(L) // 2
-        firstHalf = L[:middleIndex]
-        secondHalf = L[middleIndex:]
-        firstHalf = merge_sort(firstHalf)
-        secondHalf = merge_sort(secondHalf)
-        return merge(firstHalf, secondHalf)
-    
+    middleIndex = len(L) // 2
+    firstHalf = L[:middleIndex]
+    secondHalf = L[middleIndex:]
+    firstHalf = merge_sort(firstHalf)
+    secondHalf = merge_sort(secondHalf)
+    return merge(firstHalf, secondHalf)
+
 # API ROUTES
 
 @app.post("/api/create_section")
@@ -293,7 +321,7 @@ def api_create_student(passcode : str, newStudent : Student):
                 som = StudentORM(displayName=newStudent.displayName,
                                  contactDetails=newStudent.contactDetails,
                                  section_id=sorm.id)
-                som.schedule = newStudent.schedule  # uses setter
+                som.schedule = newStudent.schedule
                 session.add(som)
                 session.commit()
                 return {'student_id': student_id}
@@ -302,14 +330,10 @@ def api_create_student(passcode : str, newStudent : Student):
 @app.get("/api/{passcode}/{student_id}/view_schedule")
 def api_view_schedule(passcode : str, student_id : int):
     """Retrieve the schedule of a student of a section."""
-    # reuse validate_student_and_get_section (returns pydantic Section)
     section: Optional[Section] = validate_student_and_get_section(passcode, student_id)
-    
     if section is not None:
         student = section.studentList[student_id]
-        schedule = student.schedule
-        return {'schedule': schedule}
-        
+        return {'schedule': student.schedule}
     return {'result': 'error', 'message': 'Student or section not found'}
 
 @app.post("/api/{passcode}/{student_id}/update_schedule")
@@ -344,32 +368,26 @@ def api_get_studentlist(passcode : str, student_id : int):
 def api_verify_passcode(passcode : str):
     """Verify if passcode exists in the database."""
     with SessionLocal() as session:
-        if get_section_orm(passcode, session) is not None:
-            return {'result': True}
-    return {'result': False}
-    
+        return {'result': get_section_orm(passcode, session) is not None}
+
 @app.get("/api/{passcode}/{student_id}/group_cumulative")
 def api_group_cumulative(passcode : str, student_id : int):
     """Retrieve a ranked list of classmates of the specified student."""
     section: Optional[Section] = validate_student_and_get_section(passcode, student_id)
-    
     if section is not None:
         student = section.studentList[student_id]
         similarSchedules = similar_hours_cumulative(student, section)
-        sortedSimilarSchedules = merge_sort(similarSchedules)
-        return {"data": sortedSimilarSchedules}
+        return {"data": merge_sort(similarSchedules)}
     return {'result': 'error', 'message': 'Student or section not found'}
-    
+
 @app.get("/api/{passcode}/{student_id}/group_consecutive")
 def api_group_consecutive(passcode : str, student_id : int):
     """Retrieve a ranked list of classmates of the specified student."""
     section: Optional[Section] = validate_student_and_get_section(passcode, student_id)
-    
     if section is not None:
         student = section.studentList[student_id]
         similarSchedules = similar_hours_consecutive(student, section)
-        sortedSimilarSchedules = merge_sort(similarSchedules)
-        return {"data": sortedSimilarSchedules}
+        return {"data": merge_sort(similarSchedules)}
     return {'result': 'error', 'message': 'Student or section not found'}
 
 @app.get("/api/{passcode}/{student_id}/schedule_intersect/{classmate_id}")
@@ -398,53 +416,53 @@ def api_check_schedule_intersection(passcode : str, student_id : int, classmate_
 @app.get("/", response_class=HTMLResponse)
 def home(request : Request):
     """View home screen."""
-    return templates.TemplateResponse("home.html", {"request": request})
+    if templates:
+        return templates.TemplateResponse("home.html", {"request": request})
+    return HTMLResponse("<h1>Templates not available</h1>")
 
 @app.get("/create_section", response_class=HTMLResponse)
 def create_section(request : Request):
     """View create section screen."""
-    return templates.TemplateResponse("create_section.html", {"request": request})
+    if templates:
+        return templates.TemplateResponse("create_section.html", {"request": request})
+    return HTMLResponse("<h1>Templates not available</h1>")
 
 @app.get("/{passcode}/create_student", response_class=HTMLResponse)
 def create_student(request : Request, passcode : str):
     """View create student screen."""
     with SessionLocal() as session:
         if get_section_orm(passcode, session) is not None:
-            return templates.TemplateResponse("create_student.html", {"request": request, 
-                                                                     "passcode": passcode})
-    return templates.TemplateResponse("error_page.html", {"request": request})
+            if templates:
+                return templates.TemplateResponse("create_student.html", {"request": request, 
+                                                                         "passcode": passcode})
+    return templates.TemplateResponse("error_page.html", {"request": request}) if templates else HTMLResponse("<h1>Error</h1>")
 
 @app.get("/{passcode}/{student_id}", response_class=HTMLResponse)
 def view_section(request : Request, passcode : str, student_id : int):
     """View schedule-table and section screen."""
     section: Optional[Section] = validate_student_and_get_section(passcode, student_id)
-    
-    if section is not None:
-        className = section.sectionName
-        classDescription = section.sectionDetails
-        displayName = section.studentList[student_id].displayName
+    if section is not None and templates:
         return templates.TemplateResponse("view_section.html", {"request": request, 
                                                                "passcode": passcode, 
                                                                "student_id": student_id,
-                                                               "displayName": displayName,
-                                                               "className": className,
-                                                               "classDescription": classDescription})
-    return templates.TemplateResponse("error_page.html", {"request": request})
+                                                               "displayName": section.studentList[student_id].displayName,
+                                                               "className": section.sectionName,
+                                                               "classDescription": section.sectionDetails})
+    return templates.TemplateResponse("error_page.html", {"request": request}) if templates else HTMLResponse("<h1>Error</h1>")
 
 @app.get("/{passcode}/{student_id}/view_group", response_class=HTMLResponse)
 def view_group(request : Request, passcode : str, student_id : int):
     """View options for groupings."""
     section: Optional[Section] = validate_student_and_get_section(passcode, student_id)
-    
     if section is not None:
         student = section.studentList[student_id]
-        schedule = student.schedule
-        if not schedule:
+        if not student.schedule:
             return RedirectResponse(f"/{passcode}/{student_id}")
-        return templates.TemplateResponse("view_groupmates.html", {"request": request, 
-                                                                   "passcode": passcode, 
-                                                                   "student_id": student_id})
-    return templates.TemplateResponse("error_page.html", {"request": request})
+        if templates:
+            return templates.TemplateResponse("view_groupmates.html", {"request": request, 
+                                                                       "passcode": passcode, 
+                                                                       "student_id": student_id})
+    return templates.TemplateResponse("error_page.html", {"request": request}) if templates else HTMLResponse("<h1>Error</h1>")
 
 @app.exception_handler(404)
 def catch_404_errors(request : Request, exc: HTTPException):
@@ -455,5 +473,3 @@ def catch_404_errors(request : Request, exc: HTTPException):
 def catch_errors(request : Request, exc: RequestValidationError):
     """Catch all for unprocessable pages."""
     return RedirectResponse("/")
-
-# Note: Application startup is handled by Vercel's serverless functions via api/index.py
