@@ -6,11 +6,13 @@
                 const passcode = "{{ passcode }}";
 
                 // Enable to quickly allow students to rejoin classes.
+                /*
                 const storedStudentID = localStorage.getItem(passcode);
 
                 if (storedStudentID) {
-                    window.location.href = `/${passcode}/${storedStudentID}`;
+                    //window.location.href = `/${passcode}/${storedStudentID}`;
                 }
+                */
 
                 document.getElementById('create-student-form').onsubmit = function() {
                     event.preventDefault();
