@@ -31,21 +31,21 @@ A. Creating shareable class codes
 - In the create class page, enter the class name, description, and maximum member count.
 - Once submitted, a class code will be displayed in the same page that you need to remember (the code will look something like this: 'ABC123').
 <div align="center">
-<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO2.png" width="50%" height="50%">
+<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO2.png" width="75%" height="75%">
 </div>
 B. Joining classes
 - In the home page, enter a valid passcode (if you have no passcode, see steps for A).
 - Once submitted, you will be prompted to create a student profile.
 - Once necessary student profile information is filled up, you will be redirected to the class view where you are able to see the details and members of the class.
 <div align="center">
-<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO1.png" width="50%" height="50%">
+<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO1.png" width="75%" height="75%">
 </div>
 C. Setting your schedule
 - Once joined in a class (see steps for B), you will be presented a table which contains timeslots for the days of the week.
 - To set your schedule, click and drag on the timeslots in which you consider as free-time or times which are most amicable for you to work with your group.
 - To save your schedule, remember to click on the save button on the top-right of the page.
 <div align="center">
-<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO3.png" width="50%" height="50%">
+<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO3.png" width="75%" height="75%">
 </div>
 D. Find your best fit groupmates
 - Once joined in a class (see steps for B) and set your schedule (see steps for C), on the top-right of the class view, click the 'Group Me' button.
@@ -53,7 +53,7 @@ D. Find your best fit groupmates
 - In the page, you need to specify whether you want your groupmates to be found through the cumulative or consecutive hours you have in common with them.
 - Once specified, you can press the search icon button which will display on a table the ranking of members that fit your schedule.
 <div align="center">
-<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO4.png" width="50%" height="50%">
-<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO5.png" width="50%" height="50%">
+<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO4.png" width="75%" height="75%">
+<img src="https://github.com/Pardigle/groupme/blob/main/demo/DEMO5.png" width="75%" height="75%">
 </div>
 
